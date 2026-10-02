@@ -1,0 +1,33 @@
+window.App = window.App || {};
+
+(function () {
+  const WHITE = '#ffffff';
+  const MAX_DIM = 64;
+
+  function makePixels(width, height) {
+    return new Array(width * height).fill(WHITE);
+  }
+
+  const state = {
+    title: 'Untitled',
+    width: 16,
+    height: 16,
+    pixels: makePixels(16, 16),
+    currentColor: '#000000',
+    currentTool: 'paint',
+  };
+
+  function indexOf(x, y, width) {
+    return y * width + x;
+  }
+
+  function coordsOf(index, width) {
+    return { x: index % width, y: Math.floor(index / width) };
+  }
+
+  App.state = state;
+  App.constants = { WHITE, MAX_DIM };
+  App.indexOf = indexOf;
+  App.coordsOf = coordsOf;
+  App.makePixels = makePixels;
+})();

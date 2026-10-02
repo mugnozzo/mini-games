@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Art Editor</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <h1>Pixel Art Editor</h1>
+    <div class="field">
+      <label for="title-input">Title</label>
+      <input type="text" id="title-input" value="Untitled" maxlength="60">
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <section class="panel">
+        <h2>Canvas Size</h2>
+        <div class="field-row">
+          <div class="field">
+            <label for="width-input">Width</label>
+            <input type="number" id="width-input" min="1" max="64" step="1" value="16">
+          </div>
+          <div class="field">
+            <label for="height-input">Height</label>
+            <input type="number" id="height-input" min="1" max="64" step="1" value="16">
+          </div>
+        </div>
+        <button id="apply-size-btn" type="button">Apply Size</button>
+        <p class="hint" id="size-hint"></p>
+      </section>
+
+      <section class="panel">
+        <h2>Tool</h2>
+        <div class="toolbar" id="tool-toolbar">
+          <button type="button" class="tool-btn active" data-tool="paint" aria-pressed="true">Paint</button>
+          <button type="button" class="tool-btn" data-tool="fill" aria-pressed="false">Fill</button>
+        </div>
+        <p class="hint">Click toggles color on/off. Right-click always erases.</p>
+      </section>
+
+      <section class="panel">
+        <h2>Color</h2>
+        <div class="field">
+          <label for="color-picker">Custom color</label>
+          <input type="color" id="color-picker" value="#000000">
+        </div>
+        <div class="swatches" id="swatches"></div>
+      </section>
+
+      <section class="panel">
+        <h2>History</h2>
+        <div class="toolbar">
+          <button type="button" id="undo-btn" disabled>Undo</button>
+          <button type="button" id="redo-btn" disabled>Redo</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>File</h2>
+        <div class="toolbar">
+          <button type="button" id="save-json-btn">Save JSON</button>
+          <button type="button" id="load-json-btn">Load JSON</button>
+        </div>
+        <input type="file" id="load-json-input" accept=".json,application/json" hidden>
+        <p class="hint" id="file-error" role="alert"></p>
+        <hr>
+        <div class="field">
+          <label for="scale-input">PNG scale</label>
+          <input type="number" id="scale-input" min="1" max="32" step="1" value="10">
+        </div>
+        <button type="button" id="export-png-btn">Export PNG</button>
+      </section>
+    </aside>
+
+    <main class="canvas-area">
+      <div id="grid" class="grid" style="--cols: 16;"></div>
+    </main>
+  </div>
+</div>
+
+<script src="js/state.js"></script>
+<script src="js/grid.js"></script>
+<script src="js/palette.js"></script>
+<script src="js/tools.js"></script>
+<script src="js/history.js"></script>
+<script src="js/fileio.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
