@@ -1,0 +1,86 @@
+:root {
+  --bg: #fef6e4;
+  --card-bg: #ffffff;
+  --text: #2b2c34;
+  --text-dim: #6b6d80;
+  --border: #e0dbd0;
+  --accent: #f582ae;
+  --accent-2: #8bd3dd;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding: 48px 20px;
+}
+
+.wrap {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 2.4rem;
+  margin: 0 0 8px;
+}
+
+p.intro {
+  color: var(--text-dim);
+  margin: 0 0 40px;
+  font-size: 1.1rem;
+}
+
+.games {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.games li {
+  margin: 0;
+}
+
+.game-card {
+  display: block;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 2px 0 var(--border);
+}
+
+.game-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  border-color: var(--accent);
+}
+
+.game-card .emoji {
+  font-size: 2.2rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.game-card h2 {
+  margin: 0 0 6px;
+  font-size: 1.2rem;
+}
+
+.game-card p {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
