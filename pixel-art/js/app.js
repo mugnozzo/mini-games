@@ -3,6 +3,8 @@
   const { WHITE, MAX_DIM } = constants;
 
   const els = {
+    sidebarToggleBtn: document.getElementById('sidebar-toggle'),
+    sidebar: document.getElementById('sidebar'),
     titleInput: document.getElementById('title-input'),
     widthInput: document.getElementById('width-input'),
     heightInput: document.getElementById('height-input'),
@@ -37,6 +39,21 @@
     history.init((canUndo, canRedo) => {
       els.undoBtn.disabled = !canUndo;
       els.redoBtn.disabled = !canRedo;
+    });
+
+    const startCollapsed = window.matchMedia('(max-width: 700px)').matches;
+    els.sidebar.classList.add('no-transition');
+    setSidebarCollapsed(startCollapsed);
+    void els.sidebar.offsetWidth;
+    els.sidebar.classList.remove('no-transition');
+
+    els.sidebarToggleBtn.addEventListener('click', () => {
+      setSidebarCollapsed(!els.sidebar.classList.contains('collapsed'));
+    });
+
+    els.sidebar.addEventListener('transitionend', (e) => {
+      if (e.propertyName !== 'width') return;
+      if (zoom.recomputeFit(els.canvasArea)) syncZoomUI();
     });
 
     els.titleInput.addEventListener('input', () => {
@@ -122,6 +139,12 @@
       els.scaleInput.value = scale;
       fileio.exportPNG(scale);
     });
+  }
+
+  function setSidebarCollapsed(collapsed) {
+    els.sidebar.classList.toggle('collapsed', collapsed);
+    els.sidebarToggleBtn.setAttribute('aria-expanded', String(!collapsed));
+    els.sidebarToggleBtn.textContent = collapsed ? '☰' : '✕';
   }
 
   function syncZoomUI() {

@@ -32,8 +32,9 @@ body {
 
 .topbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 24px;
+  gap: 10px 24px;
   padding: 12px 20px;
   border-bottom: 1px solid var(--border);
   background: var(--panel-bg);
@@ -43,6 +44,17 @@ body {
   font-size: 1.1rem;
   margin: 0;
   white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.topbar .field {
+  min-width: 0;
+}
+
+.sidebar-toggle {
+  padding: 7px 12px;
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .header-links {
@@ -76,9 +88,21 @@ body {
   padding: 16px;
   border-right: 1px solid var(--border);
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  transition: width 0.2s ease, padding 0.2s ease, border-color 0.2s ease;
+}
+
+.sidebar.collapsed {
+  width: 0;
+  padding: 0;
+  border-right-color: transparent;
+}
+
+.sidebar.no-transition {
+  transition: none;
 }
 
 .panel {
@@ -122,6 +146,7 @@ input[type="number"] {
   padding: 6px 8px;
   font-size: 0.9rem;
   width: 100%;
+  min-width: 0;
 }
 
 input[type="range"] {

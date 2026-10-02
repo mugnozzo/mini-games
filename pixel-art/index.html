@@ -9,6 +9,7 @@
 <body>
 <div class="app">
   <header class="topbar">
+    <button type="button" id="sidebar-toggle" class="sidebar-toggle" aria-expanded="true" aria-controls="sidebar">☰</button>
     <h1>Pixel Art Editor</h1>
     <div class="field">
       <label for="title-input">Title</label>
@@ -21,7 +22,7 @@
   </header>
 
   <div class="layout">
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <section class="panel">
         <h2>Canvas Size</h2>
         <div class="field-row">
