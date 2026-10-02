@@ -1,5 +1,5 @@
 (function () {
-  const { state, grid, palette, tools, history, fileio, constants } = App;
+  const { state, grid, zoom, palette, tools, history, fileio, constants } = App;
   const { WHITE, MAX_DIM } = constants;
 
   const els = {
@@ -8,6 +8,11 @@
     heightInput: document.getElementById('height-input'),
     applySizeBtn: document.getElementById('apply-size-btn'),
     sizeHint: document.getElementById('size-hint'),
+    zoomSlider: document.getElementById('zoom-slider'),
+    zoomValue: document.getElementById('zoom-value'),
+    fitWidthBtn: document.getElementById('fit-width-btn'),
+    fitHeightBtn: document.getElementById('fit-height-btn'),
+    canvasArea: document.getElementById('canvas-area'),
     toolToolbar: document.getElementById('tool-toolbar'),
     colorPicker: document.getElementById('color-picker'),
     swatches: document.getElementById('swatches'),
@@ -23,6 +28,10 @@
   };
 
   function init() {
+    grid.setOnResize(() => {
+      zoom.recomputeFit(els.canvasArea);
+      syncZoomUI();
+    });
     grid.init(els.grid);
     palette.init(els.swatches, els.colorPicker);
     history.init((canUndo, canRedo) => {
@@ -35,6 +44,25 @@
     });
 
     els.applySizeBtn.addEventListener('click', applySize);
+
+    els.zoomSlider.addEventListener('input', () => {
+      zoom.setZoom(Number(els.zoomSlider.value), 'manual');
+      syncZoomUI();
+    });
+
+    els.fitWidthBtn.addEventListener('click', () => {
+      zoom.fitWidth(els.canvasArea);
+      syncZoomUI();
+    });
+
+    els.fitHeightBtn.addEventListener('click', () => {
+      zoom.fitHeight(els.canvasArea);
+      syncZoomUI();
+    });
+
+    window.addEventListener('resize', () => {
+      if (zoom.recomputeFit(els.canvasArea)) syncZoomUI();
+    });
 
     els.toolToolbar.addEventListener('click', (e) => {
       const btn = e.target.closest('.tool-btn');
@@ -94,6 +122,11 @@
       els.scaleInput.value = scale;
       fileio.exportPNG(scale);
     });
+  }
+
+  function syncZoomUI() {
+    els.zoomSlider.value = state.cellSize;
+    els.zoomValue.textContent = state.cellSize + 'px';
   }
 
   function clampInt(value, min, max, fallback) {

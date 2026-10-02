@@ -3,6 +3,9 @@ window.App = window.App || {};
 (function () {
   const WHITE = '#ffffff';
   const MAX_DIM = 64;
+  const MIN_CELL_SIZE = 4;
+  const MAX_CELL_SIZE = 64;
+  const DEFAULT_CELL_SIZE = 16;
 
   function makePixels(width, height) {
     return new Array(width * height).fill(WHITE);
@@ -15,6 +18,8 @@ window.App = window.App || {};
     pixels: makePixels(16, 16),
     currentColor: '#000000',
     currentTool: 'paint',
+    cellSize: DEFAULT_CELL_SIZE,
+    zoomMode: 'manual', // 'manual' | 'fit-width' | 'fit-height'
   };
 
   function indexOf(x, y, width) {
@@ -26,7 +31,7 @@ window.App = window.App || {};
   }
 
   App.state = state;
-  App.constants = { WHITE, MAX_DIM };
+  App.constants = { WHITE, MAX_DIM, MIN_CELL_SIZE, MAX_CELL_SIZE, DEFAULT_CELL_SIZE };
   App.indexOf = indexOf;
   App.coordsOf = coordsOf;
   App.makePixels = makePixels;

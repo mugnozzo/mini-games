@@ -2,10 +2,16 @@
   const { state } = App;
 
   let gridEl = null;
+  let onResize = null;
 
   function init(el) {
     gridEl = el;
+    setCellSize(state.cellSize);
     buildGrid(state.width, state.height, state.pixels);
+  }
+
+  function setOnResize(fn) {
+    onResize = fn;
   }
 
   function buildGrid(width, height, pixels) {
@@ -25,6 +31,8 @@
       fragment.appendChild(cell);
     }
     gridEl.appendChild(fragment);
+
+    if (onResize) onResize();
   }
 
   function setCell(index, color) {
@@ -33,5 +41,10 @@
     if (cell) cell.style.backgroundColor = color;
   }
 
-  App.grid = { init, buildGrid, setCell };
+  function setCellSize(size) {
+    state.cellSize = size;
+    gridEl.style.setProperty('--cell-size', size + 'px');
+  }
+
+  App.grid = { init, buildGrid, setCell, setCellSize, setOnResize };
 })();

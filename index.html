@@ -35,6 +35,18 @@
       </section>
 
       <section class="panel">
+        <h2>Zoom</h2>
+        <div class="field">
+          <label for="zoom-slider">Cell size: <span id="zoom-value">16px</span></label>
+          <input type="range" id="zoom-slider" min="4" max="64" step="1" value="16">
+        </div>
+        <div class="toolbar">
+          <button type="button" id="fit-width-btn">Fit Width</button>
+          <button type="button" id="fit-height-btn">Fit Height</button>
+        </div>
+      </section>
+
+      <section class="panel">
         <h2>Tool</h2>
         <div class="toolbar" id="tool-toolbar">
           <button type="button" class="tool-btn active" data-tool="paint" aria-pressed="true">Paint</button>
@@ -77,7 +89,7 @@
       </section>
     </aside>
 
-    <main class="canvas-area">
+    <main class="canvas-area" id="canvas-area">
       <div id="grid" class="grid" style="--cols: 16;"></div>
     </main>
   </div>
@@ -85,6 +97,7 @@
 
 <script src="js/state.js"></script>
 <script src="js/grid.js"></script>
+<script src="js/zoom.js"></script>
 <script src="js/palette.js"></script>
 <script src="js/tools.js"></script>
 <script src="js/history.js"></script>
