@@ -27,6 +27,7 @@
     scaleInput: document.getElementById('scale-input'),
     exportPngBtn: document.getElementById('export-png-btn'),
     grid: document.getElementById('grid'),
+    fullscreenBtn: document.getElementById('fullscreen-toggle'),
   };
 
   function init() {
@@ -55,6 +56,24 @@
       if (e.propertyName !== 'width') return;
       if (zoom.recomputeFit(els.canvasArea)) syncZoomUI();
     });
+
+    if (document.documentElement.requestFullscreen) {
+      els.fullscreenBtn.addEventListener('click', () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.documentElement.requestFullscreen().catch(() => {});
+        }
+      });
+
+      document.addEventListener('fullscreenchange', () => {
+        const isFullscreen = !!document.fullscreenElement;
+        els.fullscreenBtn.textContent = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen';
+        els.fullscreenBtn.setAttribute('aria-pressed', String(isFullscreen));
+      });
+    } else {
+      els.fullscreenBtn.style.display = 'none';
+    }
 
     els.titleInput.addEventListener('input', () => {
       state.title = els.titleInput.value;
@@ -92,19 +111,46 @@
       });
     });
 
-    els.grid.addEventListener('click', (e) => {
+    let strokeActive = false;
+
+    els.grid.addEventListener('pointerdown', (e) => {
       const cell = e.target.closest('.cell');
       if (!cell) return;
+      e.preventDefault();
       const index = Number(cell.dataset.index);
-      if (state.currentTool === 'fill') tools.handleFill(index);
-      else tools.handlePaint(index);
+
+      if (e.button === 2) {
+        tools.beginStroke(index, 'erase');
+        strokeActive = true;
+        return;
+      }
+      if (e.button !== 0) return;
+
+      if (state.currentTool === 'fill') {
+        tools.handleFill(index);
+        return;
+      }
+      tools.beginStroke(index, 'paint');
+      strokeActive = true;
     });
+
+    document.addEventListener('pointermove', (e) => {
+      if (!strokeActive) return;
+      const target = document.elementFromPoint(e.clientX, e.clientY);
+      const cell = target && target.closest && target.closest('.cell');
+      if (!cell) return;
+      tools.continueStroke(Number(cell.dataset.index));
+    });
+
+    const endActiveStroke = () => {
+      if (strokeActive) tools.endStroke();
+      strokeActive = false;
+    };
+    document.addEventListener('pointerup', endActiveStroke);
+    document.addEventListener('pointercancel', endActiveStroke);
 
     els.grid.addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      const cell = e.target.closest('.cell');
-      if (!cell) return;
-      tools.handleErase(Number(cell.dataset.index));
     });
 
     els.undoBtn.addEventListener('click', () => history.undo());

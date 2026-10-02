@@ -64,6 +64,14 @@ body {
   gap: 16px;
 }
 
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
 .other-games-link {
   color: var(--text-dim);
   font-size: 0.85rem;
@@ -246,6 +254,8 @@ hr {
   background: #ffffff;
   width: max-content;
   flex-shrink: 0;
+  touch-action: none;
+  user-select: none;
 }
 
 .cell {
