@@ -1,5 +1,7 @@
 # mini-games
 
+Hosted at [mugnozzo.xyz/mini-games](https://mugnozzo.xyz/mini-games).
+
 A place to host some mini-games I make for my children.
 
 ## pixel-art
