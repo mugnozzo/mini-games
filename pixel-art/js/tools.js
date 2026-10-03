@@ -79,16 +79,7 @@
 
   function beginStroke(index, mode) {
     const brushSize = state.brushSize || 1;
-    let color;
-    if (mode === 'erase') {
-      color = WHITE;
-    } else if (brushSize <= 1) {
-      // Single-cell brush: preserve the existing click-to-toggle convenience.
-      color = state.pixels[index] === state.currentColor ? WHITE : state.currentColor;
-    } else {
-      // A multi-cell brush has no single sensible toggle target, so it always paints flat.
-      color = state.currentColor;
-    }
+    const color = mode === 'erase' ? WHITE : state.currentColor;
     stroke = { mode, color, lastCenter: index, touched: new Map() };
     brushIndices(index, brushSize, state.width, state.height).forEach((i) => applyToStroke(i, color));
   }
@@ -96,19 +87,6 @@
   function continueStroke(index) {
     if (!stroke || stroke.lastCenter === index) return;
     stroke.lastCenter = index;
-
-    // Reaching a second point means this is a real drag, not a click: a paint stroke always
-    // applies the current color from here on (no toggle), even if the first point toggled to white.
-    if (stroke.mode === 'paint' && stroke.color !== state.currentColor) {
-      stroke.color = state.currentColor;
-      stroke.touched.forEach((entry) => {
-        if (entry.after !== stroke.color) {
-          grid.setCell(entry.index, stroke.color);
-          entry.after = stroke.color;
-        }
-      });
-    }
-
     const brushSize = state.brushSize || 1;
     brushIndices(index, brushSize, state.width, state.height).forEach((i) => applyToStroke(i, stroke.color));
   }
