@@ -1,13 +1,15 @@
 (function () {
   const { state, grid, zoom, palette, tools, history, fileio, constants } = App;
-  const { WHITE, MAX_DIM } = constants;
+  const { WHITE } = constants;
 
   const els = {
     sidebarToggleBtn: document.getElementById('sidebar-toggle'),
     sidebar: document.getElementById('sidebar'),
     titleInput: document.getElementById('title-input'),
     widthInput: document.getElementById('width-input'),
+    widthValue: document.getElementById('width-value'),
     heightInput: document.getElementById('height-input'),
+    heightValue: document.getElementById('height-value'),
     applySizeBtn: document.getElementById('apply-size-btn'),
     sizeHint: document.getElementById('size-hint'),
     zoomSlider: document.getElementById('zoom-slider'),
@@ -81,6 +83,13 @@
     });
 
     els.applySizeBtn.addEventListener('click', applySize);
+
+    els.widthInput.addEventListener('input', () => {
+      els.widthValue.textContent = els.widthInput.value;
+    });
+    els.heightInput.addEventListener('input', () => {
+      els.heightValue.textContent = els.heightInput.value;
+    });
 
     els.zoomSlider.addEventListener('input', () => {
       zoom.setZoom(Number(els.zoomSlider.value), 'manual');
@@ -207,11 +216,14 @@
     return Math.min(max, Math.max(min, n));
   }
 
+  function syncSizeLabels() {
+    els.widthValue.textContent = els.widthInput.value;
+    els.heightValue.textContent = els.heightInput.value;
+  }
+
   function applySize() {
-    const newWidth = clampInt(els.widthInput.value, 1, MAX_DIM, state.width);
-    const newHeight = clampInt(els.heightInput.value, 1, MAX_DIM, state.height);
-    els.widthInput.value = newWidth;
-    els.heightInput.value = newHeight;
+    const newWidth = Number(els.widthInput.value);
+    const newHeight = Number(els.heightInput.value);
 
     if (newWidth === state.width && newHeight === state.height) {
       els.sizeHint.textContent = '';
@@ -241,6 +253,7 @@
       if (!ok) {
         els.widthInput.value = prevWidth;
         els.heightInput.value = prevHeight;
+        syncSizeLabels();
         return;
       }
     }
@@ -261,6 +274,7 @@
     els.titleInput.value = result.title;
     els.widthInput.value = result.width;
     els.heightInput.value = result.height;
+    syncSizeLabels();
 
     grid.buildGrid(result.width, result.height, result.pixels);
     history.clear();
