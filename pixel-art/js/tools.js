@@ -78,5 +78,15 @@
     if (changes.length > 0) App.history.pushPixelChanges(changes);
   }
 
-  App.tools = { floodFill, handleFill, beginStroke, continueStroke, endStroke };
+  function handleClearAll() {
+    const changes = [];
+    state.pixels.forEach((color, index) => {
+      if (color !== WHITE) changes.push({ index, before: color, after: WHITE });
+    });
+    if (changes.length === 0) return;
+    changes.forEach((c) => grid.setCell(c.index, c.after));
+    App.history.pushPixelChanges(changes);
+  }
+
+  App.tools = { floodFill, handleFill, beginStroke, continueStroke, endStroke, handleClearAll };
 })();

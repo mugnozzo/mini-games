@@ -16,6 +16,7 @@
     fitHeightBtn: document.getElementById('fit-height-btn'),
     canvasArea: document.getElementById('canvas-area'),
     toolToolbar: document.getElementById('tool-toolbar'),
+    clearBtn: document.getElementById('clear-btn'),
     colorPicker: document.getElementById('color-picker'),
     swatches: document.getElementById('swatches'),
     undoBtn: document.getElementById('undo-btn'),
@@ -110,6 +111,8 @@
         b.setAttribute('aria-pressed', String(active));
       });
     });
+
+    els.clearBtn.addEventListener('click', () => tools.handleClearAll());
 
     let strokeActive = false;
 
