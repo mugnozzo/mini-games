@@ -23,6 +23,7 @@
     brushValue: document.getElementById('brush-value'),
     colorPicker: document.getElementById('color-picker'),
     swatches: document.getElementById('swatches'),
+    usedSwatches: document.getElementById('used-swatches'),
     undoBtn: document.getElementById('undo-btn'),
     redoBtn: document.getElementById('redo-btn'),
     saveJsonBtn: document.getElementById('save-json-btn'),
@@ -41,10 +42,11 @@
       syncZoomUI();
     });
     grid.init(els.grid);
-    palette.init(els.swatches, els.colorPicker);
+    palette.init(els.swatches, els.colorPicker, els.usedSwatches);
     history.init((canUndo, canRedo) => {
       els.undoBtn.disabled = !canUndo;
       els.redoBtn.disabled = !canRedo;
+      palette.refreshUsedColors();
     });
 
     const startCollapsed = window.matchMedia('(max-width: 700px)').matches;
