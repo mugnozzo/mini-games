@@ -19,6 +19,8 @@
     canvasArea: document.getElementById('canvas-area'),
     toolToolbar: document.getElementById('tool-toolbar'),
     clearBtn: document.getElementById('clear-btn'),
+    brushSlider: document.getElementById('brush-slider'),
+    brushValue: document.getElementById('brush-value'),
     colorPicker: document.getElementById('color-picker'),
     swatches: document.getElementById('swatches'),
     undoBtn: document.getElementById('undo-btn'),
@@ -122,6 +124,11 @@
     });
 
     els.clearBtn.addEventListener('click', () => tools.handleClearAll());
+
+    els.brushSlider.addEventListener('input', () => {
+      state.brushSize = Number(els.brushSlider.value);
+      els.brushValue.textContent = els.brushSlider.value;
+    });
 
     let strokeActive = false;
 

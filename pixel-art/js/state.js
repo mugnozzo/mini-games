@@ -18,6 +18,7 @@ window.App = window.App || {};
     pixels: makePixels(16, 16),
     currentColor: '#000000',
     currentTool: 'paint',
+    brushSize: 1,
     cellSize: DEFAULT_CELL_SIZE,
     zoomMode: 'manual', // 'manual' | 'fit-width' | 'fit-height'
   };

@@ -35,23 +35,62 @@
     App.history.pushPixelChanges(changes);
   }
 
-  // A "stroke" covers both a plain click (1 cell) and a drag (many cells), unified so
-  // every press produces exactly one history entry regardless of how many cells it touches.
-  let stroke = null; // { mode: 'paint' | 'erase', color, touched: Map<index, {index, before, after}> }
+  // All in-bounds cell indices covered by a square brush of the given size, centered on
+  // centerIndex (size 1 = just the cell itself; even sizes bias down-right of center).
+  function brushIndices(centerIndex, size, width, height) {
+    if (size <= 1) return [centerIndex];
+    const cx = centerIndex % width;
+    const cy = Math.floor(centerIndex / width);
+    const half = Math.floor((size - 1) / 2);
+    const indices = [];
+    for (let y = cy - half; y < cy - half + size; y++) {
+      if (y < 0 || y >= height) continue;
+      for (let x = cx - half; x < cx - half + size; x++) {
+        if (x < 0 || x >= width) continue;
+        indices.push(y * width + x);
+      }
+    }
+    return indices;
+  }
 
-  function beginStroke(index, mode) {
+  // A "stroke" covers both a plain click (1+ cells via the brush) and a drag (many cells),
+  // unified so every press produces exactly one history entry regardless of how many cells
+  // or brush points it touches.
+  let stroke = null; // { mode: 'paint' | 'erase', color, lastCenter, touched: Map<index, {index, before, after}> }
+
+  function applyToStroke(index, color) {
+    if (stroke.touched.has(index)) return;
     const before = state.pixels[index];
-    const color = mode === 'erase' ? WHITE : (before === state.currentColor ? WHITE : state.currentColor);
-    stroke = { mode, color, touched: new Map() };
-    if (before !== color) grid.setCell(index, color);
+    if (before === color) {
+      stroke.touched.set(index, { index, before, after: before });
+      return;
+    }
+    grid.setCell(index, color);
     stroke.touched.set(index, { index, before, after: color });
   }
 
-  function continueStroke(index) {
-    if (!stroke || stroke.touched.has(index)) return;
+  function beginStroke(index, mode) {
+    const brushSize = state.brushSize || 1;
+    let color;
+    if (mode === 'erase') {
+      color = WHITE;
+    } else if (brushSize <= 1) {
+      // Single-cell brush: preserve the existing click-to-toggle convenience.
+      color = state.pixels[index] === state.currentColor ? WHITE : state.currentColor;
+    } else {
+      // A multi-cell brush has no single sensible toggle target, so it always paints flat.
+      color = state.currentColor;
+    }
+    stroke = { mode, color, lastCenter: index, touched: new Map() };
+    brushIndices(index, brushSize, state.width, state.height).forEach((i) => applyToStroke(i, color));
+  }
 
-    // Reaching a second cell means this is a real drag, not a click: a paint stroke always
-    // applies the current color from here on (no toggle), even if the first cell toggled to white.
+  function continueStroke(index) {
+    if (!stroke || stroke.lastCenter === index) return;
+    stroke.lastCenter = index;
+
+    // Reaching a second point means this is a real drag, not a click: a paint stroke always
+    // applies the current color from here on (no toggle), even if the first point toggled to white.
     if (stroke.mode === 'paint' && stroke.color !== state.currentColor) {
       stroke.color = state.currentColor;
       stroke.touched.forEach((entry) => {
@@ -62,13 +101,8 @@
       });
     }
 
-    const before = state.pixels[index];
-    if (before === stroke.color) {
-      stroke.touched.set(index, { index, before, after: before });
-      return;
-    }
-    grid.setCell(index, stroke.color);
-    stroke.touched.set(index, { index, before, after: stroke.color });
+    const brushSize = state.brushSize || 1;
+    brushIndices(index, brushSize, state.width, state.height).forEach((i) => applyToStroke(i, stroke.color));
   }
 
   function endStroke() {
@@ -88,5 +122,5 @@
     App.history.pushPixelChanges(changes);
   }
 
-  App.tools = { floodFill, handleFill, beginStroke, continueStroke, endStroke, handleClearAll };
+  App.tools = { floodFill, handleFill, brushIndices, beginStroke, continueStroke, endStroke, handleClearAll };
 })();
