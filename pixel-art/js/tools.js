@@ -35,18 +35,26 @@
     App.history.pushPixelChanges(changes);
   }
 
-  // All in-bounds cell indices covered by a square brush of the given size, centered on
+  // All in-bounds cell indices covered by a round brush of the given size, centered on
   // centerIndex (size 1 = just the cell itself; even sizes bias down-right of center).
   function brushIndices(centerIndex, size, width, height) {
     if (size <= 1) return [centerIndex];
     const cx = centerIndex % width;
     const cy = Math.floor(centerIndex / width);
     const half = Math.floor((size - 1) / 2);
+    // For even sizes the true center sits between cells, not on one — measuring distance
+    // from that midpoint (rather than the asymmetric bounding box's corner cell) keeps the
+    // shape symmetric instead of growing a stray single-cell spike on one side.
+    const centerOffset = size % 2 === 0 ? 0.5 : 0;
+    const radius = size / 2;
     const indices = [];
     for (let y = cy - half; y < cy - half + size; y++) {
       if (y < 0 || y >= height) continue;
+      const dy = y - cy - centerOffset;
       for (let x = cx - half; x < cx - half + size; x++) {
         if (x < 0 || x >= width) continue;
+        const dx = x - cx - centerOffset;
+        if (dx * dx + dy * dy > radius * radius) continue;
         indices.push(y * width + x);
       }
     }
