@@ -1,6 +1,6 @@
 (function () {
-  const { state, grid, zoom, palette, tools, history, fileio, constants } = App;
-  const { WHITE } = constants;
+  const { state, grid, zoom, palette, tools, history, fileio, imageImport, constants } = App;
+  const { WHITE, MAX_DIM } = constants;
 
   const els = {
     sidebarToggleBtn: document.getElementById('sidebar-toggle'),
@@ -12,6 +12,9 @@
     heightValue: document.getElementById('height-value'),
     applySizeBtn: document.getElementById('apply-size-btn'),
     sizeHint: document.getElementById('size-hint'),
+    importImageBtn: document.getElementById('import-image-btn'),
+    importImageInput: document.getElementById('import-image-input'),
+    imageError: document.getElementById('image-error'),
     zoomSlider: document.getElementById('zoom-slider'),
     zoomValue: document.getElementById('zoom-value'),
     fitWidthBtn: document.getElementById('fit-width-btn'),
@@ -38,6 +41,9 @@
 
   function init() {
     grid.setOnResize(() => {
+      els.widthInput.value = state.width;
+      els.heightInput.value = state.height;
+      syncSizeLabels();
       zoom.recomputeFit(els.canvasArea);
       syncZoomUI();
     });
@@ -93,6 +99,14 @@
     });
     els.heightInput.addEventListener('input', () => {
       els.heightValue.textContent = els.heightInput.value;
+    });
+
+    els.importImageBtn.addEventListener('click', () => els.importImageInput.click());
+    els.importImageInput.addEventListener('change', () => {
+      const file = els.importImageInput.files[0];
+      els.importImageInput.value = '';
+      if (!file) return;
+      imageImport.importImageFile(file, MAX_DIM, handleImageImportResult);
     });
 
     els.zoomSlider.addEventListener('input', () => {
@@ -281,12 +295,30 @@
 
     state.title = result.title;
     els.titleInput.value = result.title;
-    els.widthInput.value = result.width;
-    els.heightInput.value = result.height;
-    syncSizeLabels();
 
     grid.buildGrid(result.width, result.height, result.pixels);
     history.clear();
+  }
+
+  function handleImageImportResult(result) {
+    if (result.error) {
+      els.imageError.textContent = result.error;
+      return;
+    }
+    els.imageError.textContent = '';
+
+    const hasContent = state.pixels.some((c) => c !== WHITE);
+    if (hasContent) {
+      const ok = confirm('Importing this image will replace the current drawing. Continue?');
+      if (!ok) return;
+    }
+
+    const prevWidth = state.width;
+    const prevHeight = state.height;
+    const prevPixels = state.pixels.slice();
+
+    grid.buildGrid(result.width, result.height, result.pixels);
+    history.pushResize(prevWidth, prevHeight, prevPixels, result.width, result.height, result.pixels.slice());
   }
 
   init();

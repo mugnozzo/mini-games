@@ -41,6 +41,14 @@
       </section>
 
       <section class="panel">
+        <h2>Image</h2>
+        <button type="button" id="import-image-btn">Import Image</button>
+        <input type="file" id="import-image-input" accept="image/*" hidden>
+        <p class="hint">Resizes the canvas to fit the image, then pixelizes it.</p>
+        <p class="hint" id="image-error" role="alert"></p>
+      </section>
+
+      <section class="panel">
         <h2>Zoom</h2>
         <div class="field">
           <label for="zoom-slider">Cell size: <span id="zoom-value">16px</span></label>
@@ -115,6 +123,7 @@
 <script src="js/tools.js"></script>
 <script src="js/history.js"></script>
 <script src="js/fileio.js"></script>
+<script src="js/imageimport.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
