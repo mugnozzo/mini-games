@@ -26,19 +26,29 @@
     const palette = [];
     const pixels = [];
 
+    function addPixel(x, y, color) {
+      if (color === WHITE) return;
+      let c = paletteIndex.get(color);
+      if (c === undefined) {
+        c = palette.length;
+        palette.push(color);
+        paletteIndex.set(color, c);
+      }
+      pixels.push({ x, y, c });
+    }
+
     for (let y = 0; y < state.height; y++) {
       for (let x = 0; x < state.width; x++) {
-        const color = state.pixels[App.indexOf(x, y, state.width)];
-        if (color === WHITE) continue;
-        let c = paletteIndex.get(color);
-        if (c === undefined) {
-          c = palette.length;
-          palette.push(color);
-          paletteIndex.set(color, c);
-        }
-        pixels.push({ x, y, c });
+        addPixel(x, y, state.pixels[App.indexOf(x, y, state.width)]);
       }
     }
+
+    // Pixels trimmed off by a previous shrink are stored out-of-band in state.hiddenPixels —
+    // fold them into the same sparse list (as entries with x/y beyond the visible width/height)
+    // so the saved file preserves the whole project, not just what's currently visible.
+    state.hiddenPixels.forEach((color, key) => {
+      addPixel(key % constants.MAX_DIM, Math.floor(key / constants.MAX_DIM), color);
+    });
 
     return {
       version: 1,
@@ -72,8 +82,10 @@
     if (!Array.isArray(obj.pixels)) return 'Invalid pixels list.';
     for (const p of obj.pixels) {
       if (!p || typeof p !== 'object') return 'Invalid pixel entry.';
-      if (!Number.isInteger(p.x) || p.x < 0 || p.x >= obj.width) return 'Pixel x out of bounds.';
-      if (!Number.isInteger(p.y) || p.y < 0 || p.y >= obj.height) return 'Pixel y out of bounds.';
+      // x/y are bounds-checked against the max canvas size, not width/height — entries beyond
+      // the visible area are valid: they're pixels hidden by a previous shrink.
+      if (!Number.isInteger(p.x) || p.x < 0 || p.x >= constants.MAX_DIM) return 'Pixel x out of bounds.';
+      if (!Number.isInteger(p.y) || p.y < 0 || p.y >= constants.MAX_DIM) return 'Pixel y out of bounds.';
       if (!Number.isInteger(p.c) || p.c < 0 || p.c >= obj.palette.length) return 'Pixel color index out of bounds.';
     }
     return null;
@@ -86,14 +98,20 @@
     const width = obj.width;
     const height = obj.height;
     const pixels = App.makePixels(width, height);
+    const hiddenPixels = new Map();
 
     obj.pixels.forEach((p) => {
-      pixels[App.indexOf(p.x, p.y, width)] = obj.palette[p.c];
+      const color = obj.palette[p.c];
+      if (p.x < width && p.y < height) {
+        pixels[App.indexOf(p.x, p.y, width)] = color;
+      } else {
+        hiddenPixels.set(p.y * constants.MAX_DIM + p.x, color);
+      }
     });
 
     const title = typeof obj.title === 'string' && obj.title.trim() ? obj.title : 'Untitled';
 
-    return { error: null, title, width, height, pixels };
+    return { error: null, title, width, height, pixels, hiddenPixels };
   }
 
   function loadJSONFile(file, onDone) {

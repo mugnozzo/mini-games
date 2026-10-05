@@ -21,6 +21,9 @@ window.App = window.App || {};
     brushSize: 1,
     cellSize: DEFAULT_CELL_SIZE,
     zoomMode: 'manual', // 'manual' | 'fit-width' | 'fit-height'
+    // Pixels trimmed off by shrinking the canvas, keyed by `y * MAX_DIM + x` so they can be
+    // restored if the canvas is grown back out to reveal that coordinate again.
+    hiddenPixels: new Map(),
   };
 
   function indexOf(x, y, width) {

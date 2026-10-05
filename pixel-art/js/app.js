@@ -10,7 +10,6 @@
     widthValue: document.getElementById('width-value'),
     heightInput: document.getElementById('height-input'),
     heightValue: document.getElementById('height-value'),
-    applySizeBtn: document.getElementById('apply-size-btn'),
     sizeHint: document.getElementById('size-hint'),
     importImageBtn: document.getElementById('import-image-btn'),
     importImageInput: document.getElementById('import-image-input'),
@@ -92,14 +91,15 @@
       state.title = els.titleInput.value;
     });
 
-    els.applySizeBtn.addEventListener('click', applySize);
-
-    els.widthInput.addEventListener('input', () => {
-      els.widthValue.textContent = els.widthInput.value;
-    });
-    els.heightInput.addEventListener('input', () => {
-      els.heightValue.textContent = els.heightInput.value;
-    });
+    els.widthInput.addEventListener('input', handleSizeSliderInput);
+    els.heightInput.addEventListener('input', handleSizeSliderInput);
+    // 'change' covers the normal release-after-drag and each discrete keyboard step; 'pointerup'
+    // is a redundant (idempotent) safety net for the edge case where a drag ends back at its
+    // starting value, which some browsers don't fire 'change' for.
+    els.widthInput.addEventListener('change', commitSizeDrag);
+    els.heightInput.addEventListener('change', commitSizeDrag);
+    els.widthInput.addEventListener('pointerup', commitSizeDrag);
+    els.heightInput.addEventListener('pointerup', commitSizeDrag);
 
     els.importImageBtn.addEventListener('click', () => els.importImageInput.click());
     els.importImageInput.addEventListener('change', () => {
@@ -244,46 +244,91 @@
     els.heightValue.textContent = els.heightInput.value;
   }
 
-  function applySize() {
-    const newWidth = Number(els.widthInput.value);
-    const newHeight = Number(els.heightInput.value);
-
-    if (newWidth === state.width && newHeight === state.height) {
-      els.sizeHint.textContent = '';
-      return;
-    }
-
-    const prevWidth = state.width;
-    const prevHeight = state.height;
-    const prevPixels = state.pixels.slice();
-
+  // Read-only: computes what the grid should show for a candidate size, *without* touching
+  // state.hiddenPixels. Safe to call on every 'input' tick of a drag — repeated calls are
+  // idempotent since nothing is consumed/mutated along the way. Pixels beyond the gesture's
+  // starting bounds are sourced from the persisted hiddenPixels map (read-only lookup); pixels
+  // within the starting bounds come straight from the gesture-start snapshot. Also returns how
+  // many pixels would end up hidden if this size were committed, for the live hint text.
+  function previewResize(prevWidth, prevHeight, prevPixels, newWidth, newHeight) {
     const nextPixels = App.makePixels(newWidth, newHeight);
-    let discarded = 0;
+    const simulatedHidden = new Set(state.hiddenPixels.keys());
+
     for (let y = 0; y < prevHeight; y++) {
       for (let x = 0; x < prevWidth; x++) {
-        const color = prevPixels[App.indexOf(x, y, prevWidth)];
-        if (color === WHITE) continue;
-        if (x < newWidth && y < newHeight) {
-          nextPixels[App.indexOf(x, y, newWidth)] = color;
+        if (x < newWidth && y < newHeight) continue;
+        if (prevPixels[App.indexOf(x, y, prevWidth)] !== WHITE) simulatedHidden.add(y * MAX_DIM + x);
+      }
+    }
+
+    for (let y = 0; y < newHeight; y++) {
+      for (let x = 0; x < newWidth; x++) {
+        let color;
+        if (x < prevWidth && y < prevHeight) {
+          color = prevPixels[App.indexOf(x, y, prevWidth)];
         } else {
-          discarded++;
+          const key = y * MAX_DIM + x;
+          color = state.hiddenPixels.get(key) || WHITE;
+          simulatedHidden.delete(key);
         }
+        if (color !== WHITE) nextPixels[App.indexOf(x, y, newWidth)] = color;
       }
     }
 
-    if (discarded > 0) {
-      const ok = confirm(`Shrinking will discard ${discarded} painted pixel(s). Continue?`);
-      if (!ok) {
-        els.widthInput.value = prevWidth;
-        els.heightInput.value = prevHeight;
-        syncSizeLabels();
-        return;
+    return { pixels: nextPixels, hiddenCount: simulatedHidden.size };
+  }
+
+  // The one real mutation of state.hiddenPixels for a resize — called exactly once, when a
+  // drag gesture commits, diffing its start size directly against its final size (the
+  // intermediate ticks in between never touched state.hiddenPixels at all).
+  function commitResize(prevWidth, prevHeight, prevPixels, newWidth, newHeight) {
+    for (let y = 0; y < prevHeight; y++) {
+      for (let x = 0; x < prevWidth; x++) {
+        if (x < newWidth && y < newHeight) continue;
+        const color = prevPixels[App.indexOf(x, y, prevWidth)];
+        if (color !== WHITE) state.hiddenPixels.set(y * MAX_DIM + x, color);
       }
     }
+    for (let y = 0; y < newHeight; y++) {
+      for (let x = 0; x < newWidth; x++) {
+        if (x < prevWidth && y < prevHeight) continue;
+        state.hiddenPixels.delete(y * MAX_DIM + x);
+      }
+    }
+  }
 
+  let sizeDrag = null; // { prevWidth, prevHeight, prevPixels }
+
+  function handleSizeSliderInput() {
+    if (!sizeDrag) {
+      sizeDrag = {
+        prevWidth: state.width,
+        prevHeight: state.height,
+        prevPixels: state.pixels.slice(),
+      };
+    }
+
+    const newWidth = Number(els.widthInput.value);
+    const newHeight = Number(els.heightInput.value);
+    const { pixels: nextPixels, hiddenCount } = previewResize(sizeDrag.prevWidth, sizeDrag.prevHeight, sizeDrag.prevPixels, newWidth, newHeight);
     grid.buildGrid(newWidth, newHeight, nextPixels);
-    history.pushResize(prevWidth, prevHeight, prevPixels, newWidth, newHeight, nextPixels.slice());
-    els.sizeHint.textContent = discarded > 0 ? `Discarded ${discarded} pixel(s).` : '';
+
+    els.sizeHint.textContent = hiddenCount > 0 ? `${hiddenCount} pixel(s) hidden — grow the canvas to bring them back.` : '';
+  }
+
+  function commitSizeDrag() {
+    if (!sizeDrag) return;
+    const { prevWidth, prevHeight, prevPixels } = sizeDrag;
+    sizeDrag = null;
+    if (prevWidth === state.width && prevHeight === state.height) return;
+
+    const prevHidden = Array.from(state.hiddenPixels.entries());
+    commitResize(prevWidth, prevHeight, prevPixels, state.width, state.height);
+    history.pushResize(
+      prevWidth, prevHeight, prevPixels,
+      state.width, state.height, state.pixels.slice(),
+      prevHidden, Array.from(state.hiddenPixels.entries()),
+    );
   }
 
   function handleLoadResult(result) {
@@ -295,6 +340,7 @@
 
     state.title = result.title;
     els.titleInput.value = result.title;
+    state.hiddenPixels = result.hiddenPixels;
 
     grid.buildGrid(result.width, result.height, result.pixels);
     history.clear();
@@ -316,9 +362,15 @@
     const prevWidth = state.width;
     const prevHeight = state.height;
     const prevPixels = state.pixels.slice();
+    const prevHidden = Array.from(state.hiddenPixels.entries());
+    state.hiddenPixels = new Map();
 
     grid.buildGrid(result.width, result.height, result.pixels);
-    history.pushResize(prevWidth, prevHeight, prevPixels, result.width, result.height, result.pixels.slice());
+    history.pushResize(
+      prevWidth, prevHeight, prevPixels,
+      result.width, result.height, result.pixels.slice(),
+      prevHidden, [],
+    );
   }
 
   init();

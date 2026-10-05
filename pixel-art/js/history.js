@@ -23,11 +23,12 @@
     notify();
   }
 
-  function pushResize(prevWidth, prevHeight, prevPixels, nextWidth, nextHeight, nextPixels) {
+  function pushResize(prevWidth, prevHeight, prevPixels, nextWidth, nextHeight, nextPixels, prevHidden, nextHidden) {
     undoStack.push({
       type: 'resize',
       prevWidth, prevHeight, prevPixels,
       nextWidth, nextHeight, nextPixels,
+      prevHidden, nextHidden,
     });
     if (undoStack.length > MAX_HISTORY) undoStack.shift();
     redoStack = [];
@@ -46,6 +47,7 @@
     if (entry.type === 'pixels') {
       entry.changes.forEach((c) => grid.setCell(c.index, c.before));
     } else {
+      state.hiddenPixels = new Map(entry.prevHidden);
       grid.buildGrid(entry.prevWidth, entry.prevHeight, entry.prevPixels.slice());
     }
     redoStack.push(entry);
@@ -58,6 +60,7 @@
     if (entry.type === 'pixels') {
       entry.changes.forEach((c) => grid.setCell(c.index, c.after));
     } else {
+      state.hiddenPixels = new Map(entry.nextHidden);
       grid.buildGrid(entry.nextWidth, entry.nextHeight, entry.nextPixels.slice());
     }
     undoStack.push(entry);
