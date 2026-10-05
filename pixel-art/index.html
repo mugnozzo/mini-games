@@ -12,8 +12,7 @@
     <button type="button" id="sidebar-toggle" class="sidebar-toggle" aria-expanded="true" aria-controls="sidebar">☰</button>
     <h1>Pixel Art Editor</h1>
     <div class="field">
-      <label for="title-input">Title</label>
-      <input type="text" id="title-input" value="Untitled" maxlength="60">
+      <input type="text" id="title-input" value="Untitled" maxlength="60" aria-label="Title" placeholder="Title">
     </div>
     <nav class="header-links">
       <button type="button" id="fullscreen-toggle" class="other-games-link link-btn" aria-pressed="false">Fullscreen</button>
@@ -25,8 +24,8 @@
   <div class="layout">
     <aside class="sidebar" id="sidebar">
       <section class="panel">
-        <h2>Canvas Size</h2>
-        <div class="field-row">
+        <h2>Canvas</h2>
+        <div class="field-column">
           <div class="field">
             <label for="width-input">Width: <span id="width-value">16</span></label>
             <input type="range" id="width-input" min="1" max="64" step="1" value="16">
@@ -38,20 +37,8 @@
         </div>
         <button id="apply-size-btn" type="button">Apply Size</button>
         <p class="hint" id="size-hint"></p>
-      </section>
-
-      <section class="panel">
-        <h2>Image</h2>
-        <button type="button" id="import-image-btn">Import Image</button>
-        <input type="file" id="import-image-input" accept="image/*" hidden>
-        <p class="hint">Resizes the canvas to fit the image, then pixelizes it.</p>
-        <p class="hint" id="image-error" role="alert"></p>
-      </section>
-
-      <section class="panel">
-        <h2>Zoom</h2>
         <div class="field">
-          <label for="zoom-slider">Cell size: <span id="zoom-value">16px</span></label>
+          <label for="zoom-slider">Zoom - cell size: <span id="zoom-value">16px</span></label>
           <input type="range" id="zoom-slider" min="4" max="64" step="1" value="16">
         </div>
         <div class="toolbar">
@@ -72,16 +59,11 @@
           <input type="range" id="brush-slider" min="1" max="8" step="1" value="1">
         </div>
         <p class="hint">Click paints with the current color. Right-click always erases.</p>
-      </section>
-
-      <section class="panel">
         <h2>Color</h2>
         <div class="field">
-          <label for="color-picker">Custom color</label>
           <input type="color" id="color-picker" value="#000000">
         </div>
         <div class="swatches" id="swatches"></div>
-        <p class="hint">Used in drawing</p>
         <div class="swatches" id="used-swatches"></div>
       </section>
 
@@ -94,19 +76,23 @@
       </section>
 
       <section class="panel">
-        <h2>File</h2>
+        <h2>Export/import image</h2>
         <div class="toolbar">
           <button type="button" id="save-json-btn">Save JSON</button>
           <button type="button" id="load-json-btn">Load JSON</button>
         </div>
         <input type="file" id="load-json-input" accept=".json,application/json" hidden>
         <p class="hint" id="file-error" role="alert"></p>
-        <hr>
         <div class="field">
           <label for="scale-input">PNG scale</label>
           <input type="number" id="scale-input" min="1" max="32" step="1" value="10">
         </div>
         <button type="button" id="export-png-btn">Export PNG</button>
+        <h2>Import image</h2>
+        <button type="button" id="import-image-btn">Import Image</button>
+        <input type="file" id="import-image-input" accept="image/*" hidden>
+        <p class="hint">Resizes the canvas to fit the image, then pixelizes it.</p>
+        <p class="hint" id="image-error" role="alert"></p>
       </section>
     </aside>
 
