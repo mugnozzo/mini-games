@@ -231,6 +231,7 @@ button:disabled {
 .icon-brush         { mask-image: url('../images/icons/brush.svg'); -webkit-mask-image: url('../images/icons/brush.svg'); }
 .icon-fill           { mask-image: url('../images/icons/fill.svg'); -webkit-mask-image: url('../images/icons/fill.svg'); }
 .icon-draw-line      { mask-image: url('../images/icons/draw-line.svg'); -webkit-mask-image: url('../images/icons/draw-line.svg'); }
+.icon-toggle-grid    { mask-image: url('../images/icons/toggle-grid.svg'); -webkit-mask-image: url('../images/icons/toggle-grid.svg'); }
 .icon-color-picker   { mask-image: url('../images/icons/color-picker.svg'); -webkit-mask-image: url('../images/icons/color-picker.svg'); }
 .icon-clear-screen   { mask-image: url('../images/icons/clear-screen.svg'); -webkit-mask-image: url('../images/icons/clear-screen.svg'); }
 .icon-manual-slider  { mask-image: url('../images/icons/manual-slider.svg'); -webkit-mask-image: url('../images/icons/manual-slider.svg'); }
@@ -242,11 +243,16 @@ button:disabled {
 .icon-zoom           { mask-image: url('../images/icons/zoom.svg'); -webkit-mask-image: url('../images/icons/zoom.svg'); }
 
 .tool-btn.active,
-.zoom-mode-btn.active {
+.zoom-mode-btn.active,
+.toggle-grid-btn.active {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--accent-text);
   font-weight: 600;
+}
+
+.toggle-grid-btn {
+  margin-top: 8px;
 }
 
 #tool-toolbar {
@@ -327,7 +333,16 @@ hr {
   outline-offset: -1px;
 }
 
+.grid.hide-grid-lines .cell {
+  outline: none;
+}
+
 .cell:hover {
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.grid.hide-grid-lines .cell:hover {
   outline: 1px solid var(--accent);
   outline-offset: -1px;
 }

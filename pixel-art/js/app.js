@@ -19,6 +19,7 @@
     zoomSlider: document.getElementById('zoom-slider'),
     zoomValue: document.getElementById('zoom-value'),
     zoomModeToolbar: document.getElementById('zoom-mode-toolbar'),
+    toggleGridBtn: document.getElementById('toggle-grid-btn'),
     canvasArea: document.getElementById('canvas-area'),
     toolToolbar: document.getElementById('tool-toolbar'),
     clearBtn: document.getElementById('clear-btn'),
@@ -130,6 +131,13 @@
         case 'contain': zoom.fitContain(els.canvasArea); break;
       }
       syncZoomUI();
+    });
+
+    els.toggleGridBtn.addEventListener('click', () => {
+      state.showGrid = !state.showGrid;
+      els.grid.classList.toggle('hide-grid-lines', !state.showGrid);
+      els.toggleGridBtn.classList.toggle('active', state.showGrid);
+      els.toggleGridBtn.setAttribute('aria-pressed', String(state.showGrid));
     });
 
     window.addEventListener('resize', () => {
