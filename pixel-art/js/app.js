@@ -16,8 +16,7 @@
     imageError: document.getElementById('image-error'),
     zoomSlider: document.getElementById('zoom-slider'),
     zoomValue: document.getElementById('zoom-value'),
-    fitWidthBtn: document.getElementById('fit-width-btn'),
-    fitHeightBtn: document.getElementById('fit-height-btn'),
+    zoomModeToolbar: document.getElementById('zoom-mode-toolbar'),
     canvasArea: document.getElementById('canvas-area'),
     toolToolbar: document.getElementById('tool-toolbar'),
     clearBtn: document.getElementById('clear-btn'),
@@ -114,13 +113,15 @@
       syncZoomUI();
     });
 
-    els.fitWidthBtn.addEventListener('click', () => {
-      zoom.fitWidth(els.canvasArea);
-      syncZoomUI();
-    });
-
-    els.fitHeightBtn.addEventListener('click', () => {
-      zoom.fitHeight(els.canvasArea);
+    els.zoomModeToolbar.addEventListener('click', (e) => {
+      const btn = e.target.closest('.zoom-mode-btn');
+      if (!btn) return;
+      switch (btn.dataset.mode) {
+        case 'manual': zoom.setZoom(state.cellSize, 'manual'); break;
+        case 'fit-width': zoom.fitWidth(els.canvasArea); break;
+        case 'fit-height': zoom.fitHeight(els.canvasArea); break;
+        case 'contain': zoom.fitContain(els.canvasArea); break;
+      }
       syncZoomUI();
     });
 
@@ -231,6 +232,11 @@
   function syncZoomUI() {
     els.zoomSlider.value = state.cellSize;
     els.zoomValue.textContent = state.cellSize + 'px';
+    els.zoomModeToolbar.querySelectorAll('.zoom-mode-btn').forEach((btn) => {
+      const active = btn.dataset.mode === state.zoomMode;
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-pressed', String(active));
+    });
   }
 
   function clampInt(value, min, max, fallback) {

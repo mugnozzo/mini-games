@@ -207,11 +207,16 @@ button:disabled {
   padding: 7px 14px;
 }
 
-.tool-btn.active {
+.tool-btn.active,
+.zoom-mode-btn.active {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--accent-text);
   font-weight: 600;
+}
+
+#zoom-mode-toolbar {
+  flex-wrap: wrap;
 }
 
 .hint {

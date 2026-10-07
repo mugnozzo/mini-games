@@ -33,11 +33,19 @@
     return setZoom(Math.floor(avail.height / state.height), 'fit-height');
   }
 
+  function fitContain(containerEl) {
+    const avail = availableSize(containerEl);
+    const widthFit = Math.floor(avail.width / state.width);
+    const heightFit = Math.floor(avail.height / state.height);
+    return setZoom(Math.min(widthFit, heightFit), 'contain');
+  }
+
   function recomputeFit(containerEl) {
     if (state.zoomMode === 'fit-width') return fitWidth(containerEl);
     if (state.zoomMode === 'fit-height') return fitHeight(containerEl);
+    if (state.zoomMode === 'contain') return fitContain(containerEl);
     return null;
   }
 
-  App.zoom = { setZoom, fitWidth, fitHeight, recomputeFit, clampCellSize };
+  App.zoom = { setZoom, fitWidth, fitHeight, fitContain, recomputeFit, clampCellSize };
 })();

@@ -40,9 +40,11 @@
           <label for="zoom-slider">Zoom - cell size: <span id="zoom-value">16px</span></label>
           <input type="range" id="zoom-slider" min="4" max="64" step="1" value="16">
         </div>
-        <div class="toolbar">
-          <button type="button" id="fit-width-btn">Fit Width</button>
-          <button type="button" id="fit-height-btn">Fit Height</button>
+        <div class="toolbar" id="zoom-mode-toolbar">
+          <button type="button" class="zoom-mode-btn" id="zoom-manual-btn" data-mode="manual" aria-pressed="false">Manual</button>
+          <button type="button" class="zoom-mode-btn" id="fit-width-btn" data-mode="fit-width" aria-pressed="false">Fit Width</button>
+          <button type="button" class="zoom-mode-btn" id="fit-height-btn" data-mode="fit-height" aria-pressed="false">Fit Height</button>
+          <button type="button" class="zoom-mode-btn active" id="fit-contain-btn" data-mode="contain" aria-pressed="true">Contain</button>
         </div>
       </section>
 
