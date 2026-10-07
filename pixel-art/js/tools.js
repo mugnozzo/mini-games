@@ -98,6 +98,10 @@
     if (changes.length > 0) App.history.pushPixelChanges(changes);
   }
 
+  function pickColor(index) {
+    App.palette.setCurrentColor(state.pixels[index]);
+  }
+
   function handleClearAll() {
     const changes = [];
     state.pixels.forEach((color, index) => {
@@ -108,5 +112,5 @@
     App.history.pushPixelChanges(changes);
   }
 
-  App.tools = { floodFill, handleFill, brushIndices, beginStroke, continueStroke, endStroke, handleClearAll };
+  App.tools = { floodFill, handleFill, brushIndices, beginStroke, continueStroke, endStroke, handleClearAll, pickColor };
 })();

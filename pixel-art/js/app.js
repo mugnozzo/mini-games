@@ -136,16 +136,24 @@
       if (zoom.recomputeFit(els.canvasArea)) syncZoomUI();
     });
 
+    let lastPaintTool = 'paint';
+
     els.toolToolbar.addEventListener('click', (e) => {
       const btn = e.target.closest('.tool-btn');
       if (!btn) return;
-      state.currentTool = btn.dataset.tool;
+      setCurrentTool(btn.dataset.tool);
+    });
+
+    function setCurrentTool(toolName) {
+      state.currentTool = toolName;
+      if (toolName === 'paint' || toolName === 'fill') lastPaintTool = toolName;
       els.toolToolbar.querySelectorAll('.tool-btn').forEach((b) => {
-        const active = b === btn;
+        const active = b.dataset.tool === toolName;
         b.classList.toggle('active', active);
         b.setAttribute('aria-pressed', String(active));
       });
-    });
+      els.grid.classList.toggle('picker-cursor', toolName === 'picker');
+    }
 
     els.clearBtn.addEventListener('click', () => tools.handleClearAll());
 
@@ -171,6 +179,11 @@
 
       if (state.currentTool === 'fill') {
         tools.handleFill(index);
+        return;
+      }
+      if (state.currentTool === 'picker') {
+        tools.pickColor(index);
+        setCurrentTool(lastPaintTool);
         return;
       }
       tools.beginStroke(index, 'paint');

@@ -286,3 +286,7 @@ hr {
   outline: 1px solid var(--accent);
   outline-offset: -1px;
 }
+
+.grid.picker-cursor .cell {
+  cursor: crosshair;
+}
