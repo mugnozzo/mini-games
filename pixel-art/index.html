@@ -27,34 +27,34 @@
         <h2>Canvas</h2>
         <div class="field-column">
           <div class="field">
-            <label for="width-input">Width: <span id="width-value">16</span></label>
+            <label for="width-input"><span class="icon icon-fit-width" aria-hidden="true"></span> Width: <span id="width-value">16</span></label>
             <input type="range" id="width-input" min="1" max="64" step="1" value="16">
           </div>
           <div class="field">
-            <label for="height-input">Height: <span id="height-value">16</span></label>
+            <label for="height-input"><span class="icon icon-fit-height" aria-hidden="true"></span> Height: <span id="height-value">16</span></label>
             <input type="range" id="height-input" min="1" max="64" step="1" value="16">
           </div>
         </div>
         <p class="hint" id="size-hint"></p>
         <div class="field">
-          <label for="zoom-slider">Zoom - cell size: <span id="zoom-value">16px</span></label>
-          <input type="range" id="zoom-slider" min="4" max="64" step="1" value="16">
+          <label for="zoom-slider"><span class="icon icon-zoom" aria-hidden="true"></span> <span id="zoom-value">16px</span></label>
+          <input type="range" id="zoom-slider" min="4" max="64" step="1" value="16" aria-label="Zoom, cell size in pixels">
         </div>
         <div class="toolbar" id="zoom-mode-toolbar">
-          <button type="button" class="zoom-mode-btn" id="zoom-manual-btn" data-mode="manual" aria-pressed="false">Manual</button>
-          <button type="button" class="zoom-mode-btn" id="fit-width-btn" data-mode="fit-width" aria-pressed="false">Fit Width</button>
-          <button type="button" class="zoom-mode-btn" id="fit-height-btn" data-mode="fit-height" aria-pressed="false">Fit Height</button>
-          <button type="button" class="zoom-mode-btn active" id="fit-contain-btn" data-mode="contain" aria-pressed="true">Contain</button>
+          <button type="button" class="zoom-mode-btn icon-btn" id="zoom-manual-btn" data-mode="manual" aria-pressed="false" title="Manual zoom" aria-label="Manual zoom"><span class="icon icon-manual-slider" aria-hidden="true"></span></button>
+          <button type="button" class="zoom-mode-btn icon-btn" id="fit-width-btn" data-mode="fit-width" aria-pressed="false" title="Fit width" aria-label="Fit width"><span class="icon icon-fit-width" aria-hidden="true"></span></button>
+          <button type="button" class="zoom-mode-btn icon-btn" id="fit-height-btn" data-mode="fit-height" aria-pressed="false" title="Fit height" aria-label="Fit height"><span class="icon icon-fit-height" aria-hidden="true"></span></button>
+          <button type="button" class="zoom-mode-btn icon-btn active" id="fit-contain-btn" data-mode="contain" aria-pressed="true" title="Contain" aria-label="Contain"><span class="icon icon-contain" aria-hidden="true"></span></button>
         </div>
       </section>
 
       <section class="panel">
         <h2>Tool</h2>
         <div class="toolbar" id="tool-toolbar">
-          <button type="button" class="tool-btn active" data-tool="paint" aria-pressed="true">Paint</button>
-          <button type="button" class="tool-btn" data-tool="fill" aria-pressed="false">Fill</button>
-          <button type="button" class="tool-btn" data-tool="picker" aria-pressed="false">Picker</button>
-          <button type="button" id="clear-btn">Clear All</button>
+          <button type="button" class="tool-btn icon-btn active" data-tool="paint" aria-pressed="true" title="Paint" aria-label="Paint"><span class="icon icon-brush" aria-hidden="true"></span></button>
+          <button type="button" class="tool-btn icon-btn" data-tool="fill" aria-pressed="false" title="Fill" aria-label="Fill"><span class="icon icon-fill" aria-hidden="true"></span></button>
+          <button type="button" class="tool-btn icon-btn" data-tool="picker" aria-pressed="false" title="Pick color" aria-label="Pick color"><span class="icon icon-color-picker" aria-hidden="true"></span></button>
+          <button type="button" id="clear-btn" class="icon-btn" title="Clear All" aria-label="Clear All"><span class="icon icon-clear-screen" aria-hidden="true"></span></button>
         </div>
         <div class="field">
           <label for="brush-slider">Brush size: <span id="brush-value">1</span></label>
@@ -72,8 +72,8 @@
       <section class="panel">
         <h2>History</h2>
         <div class="toolbar">
-          <button type="button" id="undo-btn" aria-label="Undo" title="Undo" disabled>↺</button>
-          <button type="button" id="redo-btn" aria-label="Redo" title="Redo" disabled>↻</button>
+          <button type="button" id="undo-btn" class="icon-btn" aria-label="Undo" title="Undo" disabled><span class="icon icon-undo" aria-hidden="true"></span></button>
+          <button type="button" id="redo-btn" class="icon-btn" aria-label="Redo" title="Redo" disabled><span class="icon icon-redo" aria-hidden="true"></span></button>
         </div>
       </section>
 

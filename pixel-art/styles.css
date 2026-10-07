@@ -200,12 +200,45 @@ button:disabled {
   gap: 8px;
 }
 
-#undo-btn,
-#redo-btn {
-  font-size: 1.1rem;
-  line-height: 1;
-  padding: 7px 14px;
+.icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  vertical-align: -3px;
 }
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+}
+
+.icon-btn .icon {
+  width: 100%;
+  height: 100%;
+}
+
+.icon-brush         { mask-image: url('../images/icons/brush.svg'); -webkit-mask-image: url('../images/icons/brush.svg'); }
+.icon-fill           { mask-image: url('../images/icons/fill.svg'); -webkit-mask-image: url('../images/icons/fill.svg'); }
+.icon-color-picker   { mask-image: url('../images/icons/color-picker.svg'); -webkit-mask-image: url('../images/icons/color-picker.svg'); }
+.icon-clear-screen   { mask-image: url('../images/icons/clear-screen.svg'); -webkit-mask-image: url('../images/icons/clear-screen.svg'); }
+.icon-manual-slider  { mask-image: url('../images/icons/manual-slider.svg'); -webkit-mask-image: url('../images/icons/manual-slider.svg'); }
+.icon-fit-width      { mask-image: url('../images/icons/fit-width.svg'); -webkit-mask-image: url('../images/icons/fit-width.svg'); }
+.icon-fit-height     { mask-image: url('../images/icons/fit-height.svg'); -webkit-mask-image: url('../images/icons/fit-height.svg'); }
+.icon-contain        { mask-image: url('../images/icons/contain.svg'); -webkit-mask-image: url('../images/icons/contain.svg'); }
+.icon-undo           { mask-image: url('../images/icons/undo.svg'); -webkit-mask-image: url('../images/icons/undo.svg'); }
+.icon-redo           { mask-image: url('../images/icons/redo.svg'); -webkit-mask-image: url('../images/icons/redo.svg'); }
+.icon-zoom           { mask-image: url('../images/icons/zoom.svg'); -webkit-mask-image: url('../images/icons/zoom.svg'); }
 
 .tool-btn.active,
 .zoom-mode-btn.active {
@@ -215,8 +248,15 @@ button:disabled {
   font-weight: 600;
 }
 
+#tool-toolbar,
 #zoom-mode-toolbar {
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+#tool-toolbar .icon-btn,
+#zoom-mode-toolbar .icon-btn {
+  width: auto;
 }
 
 .hint {
