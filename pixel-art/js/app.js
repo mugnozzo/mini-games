@@ -13,6 +13,8 @@
     sizeHint: document.getElementById('size-hint'),
     importImageBtn: document.getElementById('import-image-btn'),
     importImageInput: document.getElementById('import-image-input'),
+    importMaxSizeInput: document.getElementById('import-max-size-input'),
+    importMaxSizeValue: document.getElementById('import-max-size-value'),
     imageError: document.getElementById('image-error'),
     zoomSlider: document.getElementById('zoom-slider'),
     zoomValue: document.getElementById('zoom-value'),
@@ -100,12 +102,17 @@
     els.widthInput.addEventListener('pointerup', commitSizeDrag);
     els.heightInput.addEventListener('pointerup', commitSizeDrag);
 
+    els.importMaxSizeInput.addEventListener('input', () => {
+      els.importMaxSizeValue.textContent = els.importMaxSizeInput.value;
+    });
+
     els.importImageBtn.addEventListener('click', () => els.importImageInput.click());
     els.importImageInput.addEventListener('change', () => {
       const file = els.importImageInput.files[0];
       els.importImageInput.value = '';
       if (!file) return;
-      imageImport.importImageFile(file, MAX_DIM, handleImageImportResult);
+      const maxSize = Number(els.importMaxSizeInput.value);
+      imageImport.importImageFile(file, maxSize, handleImageImportResult);
     });
 
     els.zoomSlider.addEventListener('input', () => {
