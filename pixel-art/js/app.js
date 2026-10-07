@@ -146,13 +146,13 @@
 
     function setCurrentTool(toolName) {
       state.currentTool = toolName;
-      if (toolName === 'paint' || toolName === 'fill') lastPaintTool = toolName;
+      if (toolName === 'paint' || toolName === 'fill' || toolName === 'line') lastPaintTool = toolName;
       els.toolToolbar.querySelectorAll('.tool-btn').forEach((b) => {
         const active = b.dataset.tool === toolName;
         b.classList.toggle('active', active);
         b.setAttribute('aria-pressed', String(active));
       });
-      els.grid.classList.toggle('picker-cursor', toolName === 'picker');
+      els.grid.classList.toggle('crosshair-cursor', toolName === 'picker' || toolName === 'line');
     }
 
     els.clearBtn.addEventListener('click', () => tools.handleClearAll());
@@ -162,7 +162,7 @@
       els.brushValue.textContent = els.brushSlider.value;
     });
 
-    let strokeActive = false;
+    let activeDrag = null; // null | 'stroke' | 'line'
 
     els.grid.addEventListener('pointerdown', (e) => {
       const cell = e.target.closest('.cell');
@@ -172,7 +172,7 @@
 
       if (e.button === 2) {
         tools.beginStroke(index, 'erase');
-        strokeActive = true;
+        activeDrag = 'stroke';
         return;
       }
       if (e.button !== 0) return;
@@ -186,24 +186,32 @@
         setCurrentTool(lastPaintTool);
         return;
       }
+      if (state.currentTool === 'line') {
+        tools.beginLine(index);
+        activeDrag = 'line';
+        return;
+      }
       tools.beginStroke(index, 'paint');
-      strokeActive = true;
+      activeDrag = 'stroke';
     });
 
     document.addEventListener('pointermove', (e) => {
-      if (!strokeActive) return;
+      if (!activeDrag) return;
       const target = document.elementFromPoint(e.clientX, e.clientY);
       const cell = target && target.closest && target.closest('.cell');
       if (!cell) return;
-      tools.continueStroke(Number(cell.dataset.index));
+      const index = Number(cell.dataset.index);
+      if (activeDrag === 'line') tools.continueLine(index);
+      else tools.continueStroke(index);
     });
 
-    const endActiveStroke = () => {
-      if (strokeActive) tools.endStroke();
-      strokeActive = false;
+    const endActiveDrag = () => {
+      if (activeDrag === 'line') tools.endLine();
+      else if (activeDrag === 'stroke') tools.endStroke();
+      activeDrag = null;
     };
-    document.addEventListener('pointerup', endActiveStroke);
-    document.addEventListener('pointercancel', endActiveStroke);
+    document.addEventListener('pointerup', endActiveDrag);
+    document.addEventListener('pointercancel', endActiveDrag);
 
     els.grid.addEventListener('contextmenu', (e) => {
       e.preventDefault();

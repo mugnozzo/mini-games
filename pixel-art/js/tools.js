@@ -98,6 +98,80 @@
     if (changes.length > 0) App.history.pushPixelChanges(changes);
   }
 
+  // Bresenham's line algorithm: every integer grid point from (x0,y0) to (x1,y1) inclusive.
+  function linePoints(x0, y0, x1, y1) {
+    const points = [];
+    const dx = Math.abs(x1 - x0);
+    const sx = x0 < x1 ? 1 : -1;
+    const dy = -Math.abs(y1 - y0);
+    const sy = y0 < y1 ? 1 : -1;
+    let err = dx + dy;
+    let x = x0;
+    let y = y0;
+    while (true) {
+      points.push({ x, y });
+      if (x === x1 && y === y1) break;
+      const e2 = 2 * err;
+      if (e2 >= dy) { err += dy; x += sx; }
+      if (e2 <= dx) { err += dx; y += sy; }
+    }
+    return points;
+  }
+
+  // All in-bounds cells covered by stamping the round brush at every point along the line
+  // from startIndex to endIndex — the "thick line" shape, consistent with how a dragged
+  // freehand stroke already applies the brush along its path.
+  function lineIndices(startIndex, endIndex, brushSize, width, height) {
+    const start = App.coordsOf(startIndex, width);
+    const end = App.coordsOf(endIndex, width);
+    const cells = new Set();
+    linePoints(start.x, start.y, end.x, end.y).forEach((p) => {
+      brushIndices(p.y * width + p.x, brushSize, width, height).forEach((i) => cells.add(i));
+    });
+    return cells;
+  }
+
+  // A "line" drag previews non-destructively: every move recomputes the full line fresh from
+  // the gesture's ORIGINAL pre-drag snapshot (never cumulatively), so dragging the endpoint
+  // around always shows exactly the current candidate line — cells that fall out of the new
+  // line are reverted to their true original color, not left as stale "ghost" paint.
+  let lineStroke = null; // { startIndex, prevPixels, lastEnd, touched: Map<index, {index, before, after}> }
+
+  function applyLinePreview(endIndex) {
+    const brushSize = state.brushSize || 1;
+    const cells = lineIndices(lineStroke.startIndex, endIndex, brushSize, state.width, state.height);
+
+    lineStroke.touched.forEach((entry, idx) => {
+      if (!cells.has(idx)) grid.setCell(idx, entry.before);
+    });
+
+    const nextTouched = new Map();
+    cells.forEach((idx) => {
+      const before = lineStroke.prevPixels[idx];
+      nextTouched.set(idx, { index: idx, before, after: state.currentColor });
+      grid.setCell(idx, state.currentColor);
+    });
+    lineStroke.touched = nextTouched;
+    lineStroke.lastEnd = endIndex;
+  }
+
+  function beginLine(index) {
+    lineStroke = { startIndex: index, prevPixels: state.pixels.slice(), lastEnd: null, touched: new Map() };
+    applyLinePreview(index);
+  }
+
+  function continueLine(index) {
+    if (!lineStroke || lineStroke.lastEnd === index) return;
+    applyLinePreview(index);
+  }
+
+  function endLine() {
+    if (!lineStroke) return;
+    const changes = Array.from(lineStroke.touched.values()).filter((c) => c.before !== c.after);
+    lineStroke = null;
+    if (changes.length > 0) App.history.pushPixelChanges(changes);
+  }
+
   function pickColor(index) {
     App.palette.setCurrentColor(state.pixels[index]);
   }
@@ -112,5 +186,8 @@
     App.history.pushPixelChanges(changes);
   }
 
-  App.tools = { floodFill, handleFill, brushIndices, beginStroke, continueStroke, endStroke, handleClearAll, pickColor };
+  App.tools = {
+    floodFill, handleFill, brushIndices, beginStroke, continueStroke, endStroke, handleClearAll, pickColor,
+    linePoints, lineIndices, beginLine, continueLine, endLine,
+  };
 })();

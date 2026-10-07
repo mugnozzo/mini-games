@@ -230,6 +230,7 @@ button:disabled {
 
 .icon-brush         { mask-image: url('../images/icons/brush.svg'); -webkit-mask-image: url('../images/icons/brush.svg'); }
 .icon-fill           { mask-image: url('../images/icons/fill.svg'); -webkit-mask-image: url('../images/icons/fill.svg'); }
+.icon-draw-line      { mask-image: url('../images/icons/draw-line.svg'); -webkit-mask-image: url('../images/icons/draw-line.svg'); }
 .icon-color-picker   { mask-image: url('../images/icons/color-picker.svg'); -webkit-mask-image: url('../images/icons/color-picker.svg'); }
 .icon-clear-screen   { mask-image: url('../images/icons/clear-screen.svg'); -webkit-mask-image: url('../images/icons/clear-screen.svg'); }
 .icon-manual-slider  { mask-image: url('../images/icons/manual-slider.svg'); -webkit-mask-image: url('../images/icons/manual-slider.svg'); }
@@ -248,7 +249,11 @@ button:disabled {
   font-weight: 600;
 }
 
-#tool-toolbar,
+#tool-toolbar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
 #zoom-mode-toolbar {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -327,6 +332,6 @@ hr {
   outline-offset: -1px;
 }
 
-.grid.picker-cursor .cell {
+.grid.crosshair-cursor .cell {
   cursor: crosshair;
 }
