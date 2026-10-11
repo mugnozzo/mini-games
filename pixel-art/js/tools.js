@@ -172,6 +172,69 @@
     if (changes.length > 0) App.history.pushPixelChanges(changes);
   }
 
+  // All in-bounds cells covered by stamping the round brush along the four edges of the
+  // axis-aligned rectangle whose opposite corners are startIndex and endIndex — the same
+  // "thick line" treatment lineIndices applies to a single segment, applied to each edge.
+  function rectIndices(startIndex, endIndex, brushSize, width, height) {
+    const start = App.coordsOf(startIndex, width);
+    const end = App.coordsOf(endIndex, width);
+    const minX = Math.min(start.x, end.x);
+    const maxX = Math.max(start.x, end.x);
+    const minY = Math.min(start.y, end.y);
+    const maxY = Math.max(start.y, end.y);
+
+    const cells = new Set();
+    const stampEdge = (x0, y0, x1, y1) => {
+      linePoints(x0, y0, x1, y1).forEach((p) => {
+        brushIndices(p.y * width + p.x, brushSize, width, height).forEach((i) => cells.add(i));
+      });
+    };
+    stampEdge(minX, minY, maxX, minY);
+    stampEdge(minX, maxY, maxX, maxY);
+    stampEdge(minX, minY, minX, maxY);
+    stampEdge(maxX, minY, maxX, maxY);
+    return cells;
+  }
+
+  // Same non-destructive preview approach as the "line" drag: every move recomputes the
+  // full rectangle outline fresh from the gesture's original pre-drag snapshot.
+  let rectStroke = null; // { startIndex, prevPixels, lastEnd, touched: Map<index, {index, before, after}> }
+
+  function applyRectPreview(endIndex) {
+    const brushSize = state.brushSize || 1;
+    const cells = rectIndices(rectStroke.startIndex, endIndex, brushSize, state.width, state.height);
+
+    rectStroke.touched.forEach((entry, idx) => {
+      if (!cells.has(idx)) grid.setCell(idx, entry.before);
+    });
+
+    const nextTouched = new Map();
+    cells.forEach((idx) => {
+      const before = rectStroke.prevPixels[idx];
+      nextTouched.set(idx, { index: idx, before, after: state.currentColor });
+      grid.setCell(idx, state.currentColor);
+    });
+    rectStroke.touched = nextTouched;
+    rectStroke.lastEnd = endIndex;
+  }
+
+  function beginRect(index) {
+    rectStroke = { startIndex: index, prevPixels: state.pixels.slice(), lastEnd: null, touched: new Map() };
+    applyRectPreview(index);
+  }
+
+  function continueRect(index) {
+    if (!rectStroke || rectStroke.lastEnd === index) return;
+    applyRectPreview(index);
+  }
+
+  function endRect() {
+    if (!rectStroke) return;
+    const changes = Array.from(rectStroke.touched.values()).filter((c) => c.before !== c.after);
+    rectStroke = null;
+    if (changes.length > 0) App.history.pushPixelChanges(changes);
+  }
+
   function pickColor(index) {
     App.palette.setCurrentColor(state.pixels[index]);
   }
@@ -189,5 +252,6 @@
   App.tools = {
     floodFill, handleFill, brushIndices, beginStroke, continueStroke, endStroke, handleClearAll, pickColor,
     linePoints, lineIndices, beginLine, continueLine, endLine,
+    rectIndices, beginRect, continueRect, endRect,
   };
 })();
