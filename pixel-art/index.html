@@ -67,7 +67,11 @@
           <input type="color" id="color-picker" value="#000000">
         </div>
         <div class="swatches" id="swatches"></div>
-        <div class="swatches" id="used-swatches"></div>
+        <h2 id="used-palette-heading" hidden>Current palette</h2>
+        <div class="used-palette" id="used-palette" hidden>
+          <div class="swatches" id="used-swatches"></div>
+          <button type="button" id="used-palette-toggle" class="palette-toggle" aria-expanded="false" hidden>Expand</button>
+        </div>
       </section>
 
       <section class="panel">

@@ -306,6 +306,22 @@ hr {
   box-shadow: 0 0 0 2px var(--accent-text), 0 0 0 3px var(--accent);
 }
 
+.used-palette #used-swatches {
+  max-height: var(--used-collapsed-height, none);
+  overflow: hidden;
+}
+
+.used-palette.expanded #used-swatches {
+  max-height: none;
+}
+
+.palette-toggle {
+  width: 100%;
+  margin-top: 6px;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
 .canvas-area {
   flex: 1;
   display: flex;

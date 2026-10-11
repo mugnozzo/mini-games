@@ -8,9 +8,15 @@
     '#0066ff', '#6a00c0', '#ff00c0', '#ff4da6',
   ];
 
+  const COLLAPSED_ROWS = 3;
+
   let swatchesEl = null;
   let usedSwatchesEl = null;
   let colorPickerEl = null;
+  let usedPaletteEl = null;
+  let usedHeadingEl = null;
+  let usedToggleEl = null;
+  let expanded = false;
 
   function makeSwatchBtn(hex) {
     const btn = document.createElement('button');
@@ -27,12 +33,16 @@
     const btn = e.target.closest('.swatch');
     if (!btn) return;
     setCurrentColor(btn.dataset.color);
+    if (usedSwatchesEl.contains(btn)) setExpanded(false);
   }
 
-  function init(swatchesContainer, colorPicker, usedSwatchesContainer) {
+  function init(swatchesContainer, colorPicker, usedSwatchesContainer, usedPaletteContainer, usedHeadingElement, usedToggleButton) {
     swatchesEl = swatchesContainer;
     colorPickerEl = colorPicker;
     usedSwatchesEl = usedSwatchesContainer;
+    usedPaletteEl = usedPaletteContainer;
+    usedHeadingEl = usedHeadingElement;
+    usedToggleEl = usedToggleButton;
 
     const fragment = document.createDocumentFragment();
     PRESET_COLORS.forEach((hex) => fragment.appendChild(makeSwatchBtn(hex)));
@@ -45,8 +55,50 @@
       setCurrentColor(e.target.value);
     });
 
+    usedToggleEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setExpanded(!expanded);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!expanded) return;
+      if (usedPaletteEl.contains(e.target)) return;
+      setExpanded(false);
+    });
+
     colorPickerEl.value = state.currentColor;
     refreshUsedColors();
+  }
+
+  function setExpanded(value) {
+    expanded = value;
+    usedPaletteEl.classList.toggle('expanded', expanded);
+    usedToggleEl.textContent = expanded ? 'Collapse' : 'Expand';
+    usedToggleEl.setAttribute('aria-expanded', String(expanded));
+  }
+
+  function updateCollapsedHeight() {
+    const firstSwatch = usedSwatchesEl.querySelector('.swatch');
+    if (!firstSwatch) {
+      usedPaletteEl.hidden = true;
+      usedHeadingEl.hidden = true;
+      usedSwatchesEl.style.removeProperty('--used-collapsed-height');
+      usedToggleEl.hidden = true;
+      setExpanded(false);
+      return;
+    }
+
+    usedPaletteEl.hidden = false;
+    usedHeadingEl.hidden = false;
+
+    const swatchHeight = firstSwatch.getBoundingClientRect().height;
+    const gap = parseFloat(getComputedStyle(usedSwatchesEl).rowGap) || 0;
+    const collapsedHeight = COLLAPSED_ROWS * swatchHeight + (COLLAPSED_ROWS - 1) * gap;
+    usedSwatchesEl.style.setProperty('--used-collapsed-height', `${collapsedHeight}px`);
+
+    const overflows = usedSwatchesEl.scrollHeight > collapsedHeight + 1;
+    usedToggleEl.hidden = !overflows;
+    if (!overflows) setExpanded(false);
   }
 
   function refreshUsedColors() {
@@ -64,6 +116,7 @@
     const fragment = document.createDocumentFragment();
     colors.forEach((hex) => fragment.appendChild(makeSwatchBtn(hex)));
     usedSwatchesEl.appendChild(fragment);
+    updateCollapsedHeight();
   }
 
   function setCurrentColor(hex) {
