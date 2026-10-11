@@ -28,6 +28,9 @@
     colorPicker: document.getElementById('color-picker'),
     swatches: document.getElementById('swatches'),
     usedSwatches: document.getElementById('used-swatches'),
+    usedPalette: document.getElementById('used-palette'),
+    usedPaletteHeading: document.getElementById('used-palette-heading'),
+    usedPaletteToggle: document.getElementById('used-palette-toggle'),
     undoBtn: document.getElementById('undo-btn'),
     redoBtn: document.getElementById('redo-btn'),
     saveJsonBtn: document.getElementById('save-json-btn'),
@@ -49,7 +52,7 @@
       syncZoomUI();
     });
     grid.init(els.grid);
-    palette.init(els.swatches, els.colorPicker, els.usedSwatches);
+    palette.init(els.swatches, els.colorPicker, els.usedSwatches, els.usedPalette, els.usedPaletteHeading, els.usedPaletteToggle);
     history.init((canUndo, canRedo) => {
       els.undoBtn.disabled = !canUndo;
       els.redoBtn.disabled = !canRedo;
