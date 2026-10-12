@@ -52,12 +52,6 @@ body {
   margin-bottom: 0;
 }
 
-.sidebar-toggle {
-  padding: 7px 12px;
-  font-size: 1rem;
-  line-height: 1;
-}
-
 .header-links {
   margin-left: auto;
   display: flex;
@@ -89,6 +83,42 @@ body {
   display: flex;
   flex: 1;
   min-height: 0;
+  position: relative;
+}
+
+.sidebar-toggle {
+  position: absolute;
+  top: 50%;
+  left: 260px;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 48px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: var(--panel-bg);
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  line-height: 1;
+  z-index: 5;
+  transition: left 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.sidebar.collapsed + .sidebar-toggle {
+  /* Half the handle's own width (20px), so centering lands it flush against the
+     left edge instead of straddling x=0 with half the tab off-screen. */
+  left: 10px;
+}
+
+.sidebar.no-transition + .sidebar-toggle {
+  transition: none;
 }
 
 .sidebar {
