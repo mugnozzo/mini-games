@@ -9,7 +9,6 @@
 <body>
 <div class="app">
   <header class="topbar">
-    <button type="button" id="sidebar-toggle" class="sidebar-toggle" aria-expanded="true" aria-controls="sidebar">☰</button>
     <h1>Pixel Art Editor</h1>
     <div class="field">
       <input type="text" id="title-input" value="Untitled" maxlength="60" aria-label="Title" placeholder="Title">
@@ -107,6 +106,8 @@
         <p class="hint" id="image-error" role="alert"></p>
       </section>
     </aside>
+
+    <button type="button" id="sidebar-toggle" class="sidebar-toggle" aria-expanded="true" aria-controls="sidebar" aria-label="Collapse sidebar">‹</button>
 
     <main class="canvas-area" id="canvas-area">
       <div id="grid" class="grid" style="--cols: 16;"></div>

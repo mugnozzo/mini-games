@@ -272,7 +272,8 @@
   function setSidebarCollapsed(collapsed) {
     els.sidebar.classList.toggle('collapsed', collapsed);
     els.sidebarToggleBtn.setAttribute('aria-expanded', String(!collapsed));
-    els.sidebarToggleBtn.textContent = collapsed ? '☰' : '✕';
+    els.sidebarToggleBtn.textContent = collapsed ? '›' : '‹';
+    els.sidebarToggleBtn.setAttribute('aria-label', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
   }
 
   function syncZoomUI() {
