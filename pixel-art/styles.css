@@ -262,6 +262,7 @@ button:disabled {
 .icon-fill           { mask-image: url('../images/icons/fill.svg'); -webkit-mask-image: url('../images/icons/fill.svg'); }
 .icon-draw-line      { mask-image: url('../images/icons/draw-line.svg'); -webkit-mask-image: url('../images/icons/draw-line.svg'); }
 .icon-rectangle      { mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='2' y='3' width='12' height='10' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E"); -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='2' y='3' width='12' height='10' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E"); }
+.icon-ellipse        { mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cellipse cx='8' cy='8' rx='6' ry='5' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E"); -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cellipse cx='8' cy='8' rx='6' ry='5' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E"); }
 .icon-toggle-grid    { mask-image: url('../images/icons/toggle-grid.svg'); -webkit-mask-image: url('../images/icons/toggle-grid.svg'); }
 .icon-color-picker   { mask-image: url('../images/icons/color-picker.svg'); -webkit-mask-image: url('../images/icons/color-picker.svg'); }
 .icon-clear-screen   { mask-image: url('../images/icons/clear-screen.svg'); -webkit-mask-image: url('../images/icons/clear-screen.svg'); }
@@ -288,7 +289,7 @@ button:disabled {
 
 #tool-toolbar {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(7, 1fr);
 }
 
 #zoom-mode-toolbar {
