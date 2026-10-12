@@ -157,13 +157,13 @@
 
     function setCurrentTool(toolName) {
       state.currentTool = toolName;
-      if (toolName === 'paint' || toolName === 'fill' || toolName === 'line' || toolName === 'rectangle') lastPaintTool = toolName;
+      if (toolName === 'paint' || toolName === 'fill' || toolName === 'line' || toolName === 'rectangle' || toolName === 'ellipse') lastPaintTool = toolName;
       els.toolToolbar.querySelectorAll('.tool-btn').forEach((b) => {
         const active = b.dataset.tool === toolName;
         b.classList.toggle('active', active);
         b.setAttribute('aria-pressed', String(active));
       });
-      els.grid.classList.toggle('crosshair-cursor', toolName === 'picker' || toolName === 'line' || toolName === 'rectangle');
+      els.grid.classList.toggle('crosshair-cursor', toolName === 'picker' || toolName === 'line' || toolName === 'rectangle' || toolName === 'ellipse');
     }
 
     els.clearBtn.addEventListener('click', () => tools.handleClearAll());
@@ -207,6 +207,11 @@
         activeDrag = 'rectangle';
         return;
       }
+      if (state.currentTool === 'ellipse') {
+        tools.beginEllipse(index);
+        activeDrag = 'ellipse';
+        return;
+      }
       tools.beginStroke(index, 'paint');
       activeDrag = 'stroke';
     });
@@ -219,12 +224,14 @@
       const index = Number(cell.dataset.index);
       if (activeDrag === 'line') tools.continueLine(index);
       else if (activeDrag === 'rectangle') tools.continueRect(index);
+      else if (activeDrag === 'ellipse') tools.continueEllipse(index);
       else tools.continueStroke(index);
     });
 
     const endActiveDrag = () => {
       if (activeDrag === 'line') tools.endLine();
       else if (activeDrag === 'rectangle') tools.endRect();
+      else if (activeDrag === 'ellipse') tools.endEllipse();
       else if (activeDrag === 'stroke') tools.endStroke();
       activeDrag = null;
     };

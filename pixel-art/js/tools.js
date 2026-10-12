@@ -235,6 +235,81 @@
     if (changes.length > 0) App.history.pushPixelChanges(changes);
   }
 
+  // Points approximating the outline of the axis-aligned ellipse inscribed in the
+  // bounding box from (x0,y0) to (x1,y1) — the ellipse analogue of linePoints. Sampled by
+  // angle at a density tied to the ellipse's own size (rather than a fixed step count) so
+  // every touched integer cell is covered with no gaps, however large the ellipse gets.
+  function ellipsePoints(x0, y0, x1, y1) {
+    const minX = Math.min(x0, x1);
+    const maxX = Math.max(x0, x1);
+    const minY = Math.min(y0, y1);
+    const maxY = Math.max(y0, y1);
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
+    const rx = (maxX - minX) / 2;
+    const ry = (maxY - minY) / 2;
+
+    const steps = Math.max(32, Math.ceil(2 * Math.PI * Math.max(rx, ry) * 2));
+    const points = [];
+    for (let i = 0; i < steps; i++) {
+      const angle = (i / steps) * 2 * Math.PI;
+      points.push({ x: Math.round(cx + rx * Math.cos(angle)), y: Math.round(cy + ry * Math.sin(angle)) });
+    }
+    return points;
+  }
+
+  // All in-bounds cells covered by stamping the round brush at every point along the
+  // ellipse outline from startIndex to endIndex — the same "thick line" treatment
+  // lineIndices and rectIndices already apply, used here for the ellipse's perimeter.
+  function ellipseIndices(startIndex, endIndex, brushSize, width, height) {
+    const start = App.coordsOf(startIndex, width);
+    const end = App.coordsOf(endIndex, width);
+    const cells = new Set();
+    ellipsePoints(start.x, start.y, end.x, end.y).forEach((p) => {
+      brushIndices(p.y * width + p.x, brushSize, width, height).forEach((i) => cells.add(i));
+    });
+    return cells;
+  }
+
+  // Same non-destructive preview approach as the "line"/"rectangle" drags: every move
+  // recomputes the full ellipse outline fresh from the gesture's original pre-drag snapshot.
+  let ellipseStroke = null; // { startIndex, prevPixels, lastEnd, touched: Map<index, {index, before, after}> }
+
+  function applyEllipsePreview(endIndex) {
+    const brushSize = state.brushSize || 1;
+    const cells = ellipseIndices(ellipseStroke.startIndex, endIndex, brushSize, state.width, state.height);
+
+    ellipseStroke.touched.forEach((entry, idx) => {
+      if (!cells.has(idx)) grid.setCell(idx, entry.before);
+    });
+
+    const nextTouched = new Map();
+    cells.forEach((idx) => {
+      const before = ellipseStroke.prevPixels[idx];
+      nextTouched.set(idx, { index: idx, before, after: state.currentColor });
+      grid.setCell(idx, state.currentColor);
+    });
+    ellipseStroke.touched = nextTouched;
+    ellipseStroke.lastEnd = endIndex;
+  }
+
+  function beginEllipse(index) {
+    ellipseStroke = { startIndex: index, prevPixels: state.pixels.slice(), lastEnd: null, touched: new Map() };
+    applyEllipsePreview(index);
+  }
+
+  function continueEllipse(index) {
+    if (!ellipseStroke || ellipseStroke.lastEnd === index) return;
+    applyEllipsePreview(index);
+  }
+
+  function endEllipse() {
+    if (!ellipseStroke) return;
+    const changes = Array.from(ellipseStroke.touched.values()).filter((c) => c.before !== c.after);
+    ellipseStroke = null;
+    if (changes.length > 0) App.history.pushPixelChanges(changes);
+  }
+
   function pickColor(index) {
     App.palette.setCurrentColor(state.pixels[index]);
   }
@@ -253,5 +328,6 @@
     floodFill, handleFill, brushIndices, beginStroke, continueStroke, endStroke, handleClearAll, pickColor,
     linePoints, lineIndices, beginLine, continueLine, endLine,
     rectIndices, beginRect, continueRect, endRect,
+    ellipsePoints, ellipseIndices, beginEllipse, continueEllipse, endEllipse,
   };
 })();
