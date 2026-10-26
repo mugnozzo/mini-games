@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekday</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Weekday</h1>
+  <p class="subtitle">Which day of the week was it?</p>
+</header>
+
+<main>
+
+  <!-- ===== SETUP ROW ===== -->
+  <section class="panel setup">
+    <div class="field">
+      <label for="fromDate">From</label>
+      <input type="date" id="fromDate">
+    </div>
+    <div class="field">
+      <label for="toDate">To</label>
+      <input type="date" id="toDate">
+    </div>
+    <button type="button" id="startEndButton" class="start">Start</button>
+    <span id="rangeError" class="error-text"></span>
+  </section>
+
+  <!-- ===== QUESTION ===== -->
+  <section class="panel question">
+    <div id="dateDisplay" class="date-display">Press Start to play</div>
+    <div id="feedback" class="feedback" aria-live="polite"></div>
+    <div id="weekdayButtons" class="weekday-buttons"></div>
+  </section>
+
+  <!-- ===== STATS ===== -->
+  <section class="panel">
+    <dl class="stats">
+      <div><dt>Guesses</dt><dd id="statGuesses">0</dd></div>
+      <div><dt>Right</dt><dd id="statRight">0</dd></div>
+      <div><dt>Wrong</dt><dd id="statWrong">0</dd></div>
+      <div><dt>Total time</dt><dd id="statTotal">–</dd></div>
+      <div><dt>Mean time</dt><dd id="statMean">–</dd></div>
+      <div><dt>Min time</dt><dd id="statMin">–</dd></div>
+      <div><dt>Max time</dt><dd id="statMax">–</dd></div>
+    </dl>
+  </section>
+
+</main>
+
+<script defer src="script.js"></script>
+</body>
+</html>

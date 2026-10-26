@@ -1,0 +1,220 @@
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --text: #1d2126;
+  --muted: #6c757d;
+  --accent: #457b9d;
+  --accent-dark: #30597a;
+  --right: #2a9d8f;
+  --wrong: #e63946;
+  --border: #dde2e7;
+  --radius: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app-header {
+  text-align: center;
+  padding: 1.2rem 1rem 0.4rem;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.subtitle {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+}
+
+main {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.panel {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* ---------- Setup row ---------- */
+
+.setup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1 1 140px;
+}
+
+.field label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+input[type="date"] {
+  font: inherit;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+#startEndButton {
+  padding: 0.6rem 1.6rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+}
+
+#startEndButton:hover {
+  background: var(--accent-dark);
+}
+
+#startEndButton.end {
+  background: var(--wrong);
+}
+
+.error-text {
+  color: var(--wrong);
+  font-size: 0.9rem;
+  flex-basis: 100%;
+}
+
+.error-text:empty {
+  display: none;
+}
+
+/* ---------- Question ---------- */
+
+.question {
+  text-align: center;
+}
+
+.date-display {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0.4rem 0;
+}
+
+.date-display.idle {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.feedback {
+  min-height: 1.5em;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+
+.feedback.right {
+  color: var(--right);
+}
+
+.feedback.wrong {
+  color: var(--wrong);
+}
+
+.weekday-buttons {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+@media (max-width: 760px) {
+  .weekday-buttons {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .weekday-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.weekday-buttons button {
+  padding: 0.9rem 0.2rem;
+  font-size: 1rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 600;
+  background: #e9eef3;
+  color: var(--text);
+  border: 2px solid transparent;
+  transition: background 0.15s ease;
+}
+
+.weekday-buttons button:not(:disabled):hover {
+  background: #d6e2ec;
+}
+
+.weekday-buttons button.right {
+  background: var(--right);
+  color: #fff;
+  opacity: 1;
+}
+
+.weekday-buttons button.wrong {
+  background: var(--wrong);
+  color: #fff;
+  opacity: 1;
+}
+
+/* ---------- Stats ---------- */
+
+.stats {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.8rem;
+  text-align: center;
+}
+
+.stats dt {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.stats dd {
+  margin: 0.2rem 0 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
