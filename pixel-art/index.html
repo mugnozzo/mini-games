@@ -53,10 +53,12 @@
         <div class="toolbar" id="tool-toolbar">
           <button type="button" class="tool-btn icon-btn active" data-tool="paint" aria-pressed="true" title="Paint" aria-label="Paint"><span class="icon icon-brush" aria-hidden="true"></span></button>
           <button type="button" class="tool-btn icon-btn" data-tool="fill" aria-pressed="false" title="Fill" aria-label="Fill"><span class="icon icon-fill" aria-hidden="true"></span></button>
+          <button type="button" class="tool-btn icon-btn" data-tool="picker" aria-pressed="false" title="Pick color" aria-label="Pick color"><span class="icon icon-color-picker" aria-hidden="true"></span></button>
           <button type="button" class="tool-btn icon-btn" data-tool="line" aria-pressed="false" title="Line" aria-label="Line"><span class="icon icon-draw-line" aria-hidden="true"></span></button>
           <button type="button" class="tool-btn icon-btn" data-tool="rectangle" aria-pressed="false" title="Rectangle" aria-label="Rectangle"><span class="icon icon-rectangle" aria-hidden="true"></span></button>
           <button type="button" class="tool-btn icon-btn" data-tool="ellipse" aria-pressed="false" title="Ellipse" aria-label="Ellipse"><span class="icon icon-ellipse" aria-hidden="true"></span></button>
-          <button type="button" class="tool-btn icon-btn" data-tool="picker" aria-pressed="false" title="Pick color" aria-label="Pick color"><span class="icon icon-color-picker" aria-hidden="true"></span></button>
+          <button type="button" id="undo-btn" class="icon-btn" aria-label="Undo" title="Undo" disabled><span class="icon icon-undo" aria-hidden="true"></span></button>
+          <button type="button" id="redo-btn" class="icon-btn" aria-label="Redo" title="Redo" disabled><span class="icon icon-redo" aria-hidden="true"></span></button>
           <button type="button" id="clear-btn" class="icon-btn" title="Clear All" aria-label="Clear All"><span class="icon icon-clear-screen" aria-hidden="true"></span></button>
         </div>
         <div class="field">
@@ -72,14 +74,6 @@
         <div class="used-palette" id="used-palette" hidden>
           <div class="swatches" id="used-swatches"></div>
           <button type="button" id="used-palette-toggle" class="palette-toggle" aria-expanded="false" hidden>Expand</button>
-        </div>
-      </section>
-
-      <section class="panel">
-        <h2>History</h2>
-        <div class="toolbar">
-          <button type="button" id="undo-btn" class="icon-btn" aria-label="Undo" title="Undo" disabled><span class="icon icon-undo" aria-hidden="true"></span></button>
-          <button type="button" id="redo-btn" class="icon-btn" aria-label="Redo" title="Redo" disabled><span class="icon icon-redo" aria-hidden="true"></span></button>
         </div>
       </section>
 
