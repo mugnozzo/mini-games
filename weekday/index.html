@@ -26,6 +26,7 @@
       <input type="date" id="toDate">
     </div>
     <button type="button" id="startEndButton" class="start">Start</button>
+    <button type="button" id="exportButton" hidden>Export JSON</button>
     <span id="rangeError" class="error-text"></span>
   </section>
 
@@ -47,6 +48,21 @@
       <div><dt>Min time</dt><dd id="statMin">–</dd></div>
       <div><dt>Max time</dt><dd id="statMax">–</dd></div>
     </dl>
+  </section>
+
+  <!-- ===== GUESS LOG ===== -->
+  <section class="panel">
+    <h2 class="panel-title">Guesses</h2>
+    <p id="logRange" class="log-range"></p>
+    <div class="table-scroll">
+      <table class="log-table">
+        <thead>
+          <tr><th>#</th><th>Date</th><th>Correct day</th><th>Your guess</th><th>Result</th><th>Time</th><th>Guessed at</th></tr>
+        </thead>
+        <tbody id="logBody"></tbody>
+      </table>
+    </div>
+    <p id="logEmpty" class="log-empty">No guesses yet</p>
   </section>
 
 </main>

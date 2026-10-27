@@ -15,6 +15,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 // =========================================================
 let gameState = null;
 let nextDateTimeout = null;
+let lastReport = null; // built on "End", used by the export button
 
 const els = {}; // populated on DOMContentLoaded
 
@@ -40,6 +41,14 @@ function formatDate(date) {
   });
 }
 
+function toIsoDate(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function formatClock(date) {
+  return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
 function formatSeconds(ms) {
   return ms === null ? '–' : (ms / 1000).toFixed(1) + ' s';
 }
@@ -62,11 +71,20 @@ function startGame() {
 
   gameState = {
     fromMs, toMs,
+    fromIso: els.fromDate.value, toIso: els.toDate.value,
+    startedAt: new Date(),
     currentDate: null,
-    shownAt: 0,
+    shownAt: 0, shownAtWall: null,
     guesses: 0, right: 0, wrong: 0,
     totalMs: 0, minMs: null, maxMs: null,
+    log: [],
   };
+  lastReport = null;
+  els.exportButton.hidden = true;
+  els.logBody.replaceChildren();
+  els.logEmpty.hidden = false;
+  els.logRange.textContent =
+    `Range: ${formatDate(new Date(fromMs))} – ${formatDate(new Date(toMs))}`;
 
   els.fromDate.disabled = true;
   els.toDate.disabled = true;
@@ -78,7 +96,9 @@ function startGame() {
 
 function endGame() {
   clearTimeout(nextDateTimeout);
+  lastReport = buildReport(gameState, new Date());
   gameState = null;
+  els.exportButton.hidden = false;
 
   els.fromDate.disabled = false;
   els.toDate.disabled = false;
@@ -97,6 +117,7 @@ function nextDate() {
   setFeedback('', '');
   resetButtons(false);
   gameState.shownAt = performance.now();
+  gameState.shownAtWall = new Date();
 }
 
 function handleGuess(dayIndex, button) {
@@ -114,6 +135,21 @@ function handleGuess(dayIndex, button) {
   gameState.maxMs = gameState.maxMs === null ? elapsed : Math.max(gameState.maxMs, elapsed);
   renderStats();
 
+  const entry = {
+    n: gameState.guesses,
+    date: toIsoDate(gameState.currentDate),
+    dateText: formatDate(gameState.currentDate),
+    range: { from: gameState.fromIso, to: gameState.toIso },
+    correctWeekday: WEEKDAYS[correctIndex],
+    guessedWeekday: WEEKDAYS[dayIndex],
+    right: isRight,
+    timeMs: Math.round(elapsed),
+    shownAt: gameState.shownAtWall.toISOString(),
+    guessedAt: new Date().toISOString(),
+  };
+  gameState.log.push(entry);
+  appendLogRow(entry);
+
   resetButtons(true);
   button.classList.add(isRight ? 'right' : 'wrong');
   if (isRight) {
@@ -128,7 +164,46 @@ function handleGuess(dayIndex, button) {
 }
 
 // =========================================================
-// 5. RENDERING
+// 5. REPORT EXPORT
+// =========================================================
+function buildReport(state, endedAt) {
+  const round = ms => (ms === null ? null : Math.round(ms));
+  return {
+    game: 'weekday',
+    startedAt: state.startedAt.toISOString(),
+    endedAt: endedAt.toISOString(),
+    durationMs: endedAt - state.startedAt,
+    range: { from: state.fromIso, to: state.toIso },
+    summary: {
+      guesses: state.guesses,
+      right: state.right,
+      wrong: state.wrong,
+      totalTimeMs: round(state.totalMs),
+      meanTimeMs: state.guesses ? round(state.totalMs / state.guesses) : null,
+      minTimeMs: round(state.minMs),
+      maxTimeMs: round(state.maxMs),
+    },
+    guesses: state.log,
+  };
+}
+
+function exportReport() {
+  if (!lastReport) return;
+  // e.g. 2026-10-27T09:14:03.512Z -> 2026-10-27_09-14-03 (UTC, like the timestamps inside)
+  const stamp = lastReport.startedAt.slice(0, 19).replace('T', '_').replaceAll(':', '-');
+  const blob = new Blob([JSON.stringify(lastReport, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `weekday-report-${stamp}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+// =========================================================
+// 6. RENDERING
 // =========================================================
 function buildWeekdayButtons() {
   for (const dayIndex of DISPLAY_ORDER) {
@@ -154,6 +229,27 @@ function setFeedback(text, kind) {
   els.feedback.className = 'feedback ' + kind;
 }
 
+function appendLogRow(entry) {
+  const row = document.createElement('tr');
+  const cells = [
+    [entry.n, 'num'],
+    [entry.dateText, ''],
+    [entry.correctWeekday, ''],
+    [entry.guessedWeekday, ''],
+    [entry.right ? '✓ Right' : '✗ Wrong', entry.right ? 'right' : 'wrong'],
+    [formatSeconds(entry.timeMs), 'num'],
+    [formatClock(new Date(entry.guessedAt)), 'num'],
+  ];
+  for (const [text, className] of cells) {
+    const cell = document.createElement('td');
+    cell.textContent = text;
+    if (className) cell.className = className;
+    row.appendChild(cell);
+  }
+  els.logBody.appendChild(row);
+  els.logEmpty.hidden = true;
+}
+
 function renderStats() {
   els.statGuesses.textContent = gameState.guesses;
   els.statRight.textContent = gameState.right;
@@ -165,12 +261,13 @@ function renderStats() {
 }
 
 // =========================================================
-// 6. INIT
+// 7. INIT
 // =========================================================
 document.addEventListener('DOMContentLoaded', () => {
   for (const id of ['fromDate', 'toDate', 'startEndButton', 'rangeError', 'dateDisplay',
     'feedback', 'weekdayButtons', 'statGuesses', 'statRight', 'statWrong',
-    'statTotal', 'statMean', 'statMin', 'statMax']) {
+    'statTotal', 'statMean', 'statMin', 'statMax',
+    'exportButton', 'logRange', 'logBody', 'logEmpty']) {
     els[id] = document.getElementById(id);
   }
 
@@ -183,4 +280,5 @@ document.addEventListener('DOMContentLoaded', () => {
     if (gameState) endGame();
     else startGame();
   });
+  els.exportButton.addEventListener('click', exportReport);
 });

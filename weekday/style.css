@@ -108,6 +108,23 @@ button:disabled {
   background: var(--wrong);
 }
 
+#exportButton {
+  padding: 0.5rem 1.2rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: transparent;
+  border: 2px solid var(--accent);
+}
+
+#exportButton:hover {
+  color: #fff;
+  background: var(--accent);
+}
+
+[hidden] {
+  display: none !important;
+}
+
 .error-text {
   color: var(--wrong);
   font-size: 0.9rem;
@@ -156,13 +173,13 @@ button:disabled {
   gap: 0.5rem;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .weekday-buttons {
     grid-template-columns: repeat(4, 1fr);
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 600px) {
   .weekday-buttons {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -170,7 +187,7 @@ button:disabled {
 
 .weekday-buttons button {
   padding: 0.9rem 0.2rem;
-  font-size: 1rem;
+  font-size: 0.95rem;
   min-width: 0;
   overflow-wrap: anywhere;
   font-weight: 600;
@@ -217,4 +234,67 @@ button:disabled {
   margin: 0.2rem 0 0;
   font-size: 1.4rem;
   font-weight: 700;
+}
+
+/* ---------- Guess log ---------- */
+
+.panel-title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.log-range {
+  margin: 0.2rem 0 0.8rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.log-range:empty {
+  display: none;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.log-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.log-table th,
+.log-table td {
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.log-table th {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.log-table td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.log-table td.right {
+  color: var(--right);
+  font-weight: 600;
+}
+
+.log-table td.wrong {
+  color: var(--wrong);
+  font-weight: 600;
+}
+
+.log-empty {
+  margin: 0.8rem 0 0;
+  color: var(--muted);
+  text-align: center;
 }
